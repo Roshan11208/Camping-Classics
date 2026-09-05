@@ -1,0 +1,70 @@
+# Camping Classics
+
+A beginner-friendly camping website with:
+
+- Trip planner
+- Packing checklist
+- Beginner guides
+- Camping games
+- Mobile-friendly layout
+- Browser-saved checklist progress
+
+## Run it locally
+
+Option 1:
+Double-click `index.html`.
+
+Option 2:
+If you have VS Code, install the Live Server extension and open `index.html` with Live Server.
+
+## Publish with GitHub Pages
+
+1. Create a GitHub repository called `camping-classics`.
+2. Upload `index.html`, `styles.css`, and `script.js`.
+3. Open the repository Settings.
+4. Go to Pages.
+5. Choose the `main` branch and `/root`.
+6. Save.
+7. GitHub will give you a public website link.
+
+## Good next upgrades
+
+- Add real campsite guides.
+- Add more trip-planner options.
+- Add user feedback form.
+- Add analytics.
+- Add database/accounts later.
+- Add custom domain later.
+
+
+## V15 features
+
+- Personalized checklist quantities
+- Add/remove custom checklist items
+- Packing progress bar
+- Official campground website links when available
+- Saved trips stored locally in the browser
+- Saved trips remember planner settings, quantities, custom items, and checked items
+
+
+## V21 product polish
+
+- Quantity-0 items no longer count toward packing progress
+- Expand All / Collapse All checklist controls
+- Set all quantities to zero
+- Checklist search
+- Optional start/end dates
+- Current-trip summary
+- Saved-trip duplicate, rename, last-edited time, and packed-count display
+- Active saved trips persist while edited
+- Duplicate custom-item protection
+- Camp Finder Try Again button
+- Active sidebar section highlighting
+- Long-text layout hardening
+
+
+## Analytics
+
+Google Analytics 4 is configured with Measurement ID `G-FJWTZ4NWHB`.
+Custom events track major feature usage without sending trip names, ZIP codes,
+or coordinates as custom event parameters.
