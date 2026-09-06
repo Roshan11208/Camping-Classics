@@ -68,3 +68,13 @@ If you have VS Code, install the Live Server extension and open `index.html` wit
 Google Analytics 4 is configured with Measurement ID `G-FJWTZ4NWHB`.
 Custom events track major feature usage without sending trip names, ZIP codes,
 or coordinates as custom event parameters.
+
+
+## V28 upgrades
+
+- Share saved trips with a link using the Web Share API when supported, with copy-link fallback
+- Shared-trip links can be imported into another browser as a new saved trip
+- Saved Trips now use improved cards with camping-type icons, detail chips, clearer progress, and status
+- Completed trips can be archived into a Past Trips section and restored later
+- Added structured, anonymous feedback collection through Google Analytics (usefulness + improvement area only)
+- No free-text feedback, trip names, ZIP codes, or coordinates are sent as feedback analytics parameters

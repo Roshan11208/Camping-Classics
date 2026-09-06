@@ -19,6 +19,20 @@ const customItemQuantity = document.getElementById("customItemQuantity");
 const saveTripBtn = document.getElementById("saveTripBtn");
 const saveTripStatus = document.getElementById("saveTripStatus");
 const savedTripsList = document.getElementById("savedTripsList");
+const feedbackButton = document.getElementById("feedbackButton");
+const feedbackModal = document.getElementById("feedbackModal");
+const feedbackForm = document.getElementById("feedbackForm");
+const feedbackArea = document.getElementById("feedbackArea");
+const feedbackStatus = document.getElementById("feedbackStatus");
+const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+
+const sharedTripModal = document.getElementById("sharedTripModal");
+const sharedTripTitle = document.getElementById("sharedTripTitle");
+const sharedTripDescription = document.getElementById("sharedTripDescription");
+const sharedTripPreview = document.getElementById("sharedTripPreview");
+const importSharedTrip = document.getElementById("importSharedTrip");
+const dismissSharedTrip = document.getElementById("dismissSharedTrip");
+const closeSharedTripModal = document.getElementById("closeSharedTripModal");
 
 
 const expandAllSections = document.getElementById("expandAllSections");
@@ -880,6 +894,155 @@ function persistActiveTrip() {
   writeSavedTrips(trips);
 }
 
+
+function tripTypeIcon(campType) {
+  if (campType === "rv") return "🚐";
+  if (campType === "cabin") return "🏡";
+  return "⛺";
+}
+
+function encodeSharePayload(value) {
+  const json = JSON.stringify(value);
+  const bytes = new TextEncoder().encode(json);
+  let binary = "";
+
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
+}
+
+function decodeSharePayload(value) {
+  const padded = value
+    .replaceAll("-", "+")
+    .replaceAll("_", "/")
+    .padEnd(Math.ceil(value.length / 4) * 4, "=");
+
+  const binary = atob(padded);
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+  const json = new TextDecoder().decode(bytes);
+
+  return JSON.parse(json);
+}
+
+function createTripShareUrl(trip) {
+  const payload = {
+    v: 1,
+    name: trip.name,
+    planner: trip.planner || {},
+    checklist: normalizeChecklist(trip.checklist)
+  };
+
+  const url = new URL(window.location.href);
+  url.hash = `sharedTrip=${encodeSharePayload(payload)}`;
+
+  return url.toString();
+}
+
+async function shareSavedTrip(trip) {
+  const url = createTripShareUrl(trip);
+  const shareData = {
+    title: `Camping Classics — ${trip.name}`,
+    text: `Here is my Camping Classics trip: ${trip.name}`,
+    url
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+      trackEvent("share_trip", { method: "native_share" });
+      return "Trip shared.";
+    }
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      trackEvent("share_trip", { method: "copy_link" });
+      return "Share link copied.";
+    }
+
+    window.prompt("Copy this trip link:", url);
+    trackEvent("share_trip", { method: "copy_prompt" });
+    return "Share link ready.";
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      return "";
+    }
+
+    window.prompt("Copy this trip link:", url);
+    return "Share link ready.";
+  }
+}
+
+function openSiteModal(modal) {
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
+}
+
+function closeSiteModal(modal) {
+  if (!modal) return;
+  modal.hidden = true;
+
+  if (!document.querySelector(".modal-backdrop:not([hidden])")) {
+    document.body.classList.remove("modal-open");
+  }
+}
+
+let pendingSharedTrip = null;
+
+function showSharedTripImport(payload) {
+  if (!payload || typeof payload !== "object") return;
+
+  const checklist = normalizeChecklist(payload.checklist || {});
+  const settings = payload.planner || {};
+  const stats = checklistProgressStats(checklist);
+  const name = String(payload.name || settings.tripName || "Shared Camping Trip").slice(0, 120);
+
+  pendingSharedTrip = {
+    name,
+    planner: {
+      ...settings,
+      tripName: name
+    },
+    checklist
+  };
+
+  sharedTripTitle.textContent = name;
+  sharedTripDescription.textContent = "Someone shared this Camping Classics trip with you.";
+  sharedTripPreview.innerHTML = `
+    <div class="shared-trip-preview-icon" aria-hidden="true">${tripTypeIcon(settings.campType)}</div>
+    <div>
+      <strong>${escapeChecklistText(name)}</strong>
+      <p>
+        ${settings.campers || "?"} camper${settings.campers === 1 ? "" : "s"}
+        · ${escapeChecklistText(tripDateLabel(settings))}
+        · ${escapeChecklistText(campTypeLabel(settings.campType))}
+      </p>
+      <span>${stats.checked} of ${stats.total} packed</span>
+    </div>
+  `;
+
+  openSiteModal(sharedTripModal);
+}
+
+function checkForSharedTripLink() {
+  const prefix = "#sharedTrip=";
+
+  if (!window.location.hash.startsWith(prefix)) return;
+
+  try {
+    const payload = decodeSharePayload(window.location.hash.slice(prefix.length));
+    showSharedTripImport(payload);
+  } catch {
+    // Ignore invalid or incomplete shared-trip links.
+  }
+}
+
+
 function renderSavedTrips() {
   const trips = loadSavedTrips().sort((a, b) => b.updatedAt - a.updatedAt);
 
@@ -893,32 +1056,50 @@ function renderSavedTrips() {
     return;
   }
 
-  savedTripsList.innerHTML = trips.map((trip) => {
+  const upcomingTrips = trips.filter((trip) => !trip.archived);
+  const pastTrips = trips.filter((trip) => trip.archived);
+
+  const renderTripCard = (trip, archived = false) => {
     const settings = trip.planner || {};
     const stats = checklistProgressStats(trip.checklist);
     const lastEdited = new Date(trip.updatedAt || trip.createdAt || Date.now()).toLocaleString(
       undefined,
       { dateStyle: "medium", timeStyle: "short" }
     );
+    const canArchive = !archived && stats.total > 0 && stats.percent === 100;
 
     return `
-      <article class="saved-trip-card">
-        <div class="saved-trip-top">
-          <div>
-            <p class="eyebrow">Saved Trip</p>
+      <article class="saved-trip-card ${archived ? "archived-trip-card" : ""}">
+        <div class="saved-trip-card-header">
+          <div class="saved-trip-icon" aria-hidden="true">${tripTypeIcon(settings.campType)}</div>
+
+          <div class="saved-trip-heading">
+            <p class="eyebrow">${archived ? "Past Trip" : "Saved Trip"}</p>
             <h3>${escapeChecklistText(trip.name)}</h3>
           </div>
-          <strong class="saved-trip-percent">${stats.percent}% packed</strong>
+
+          <div class="saved-trip-status-wrap">
+            <strong class="saved-trip-percent">${stats.percent}% packed</strong>
+            ${
+              canArchive
+                ? '<span class="saved-trip-ready">Ready to archive</span>'
+                : archived
+                  ? '<span class="saved-trip-archived">Archived</span>'
+                  : ""
+            }
+          </div>
         </div>
 
-        <p class="saved-trip-meta">
-          ${settings.campers || "?"} camper${settings.campers === 1 ? "" : "s"}
-          · ${escapeChecklistText(tripDateLabel(settings))}
-          · ${escapeChecklistText(campTypeLabel(settings.campType))}
-        </p>
+        <div class="saved-trip-detail-chips">
+          <span>${settings.campers || "?"} camper${settings.campers === 1 ? "" : "s"}</span>
+          <span>${escapeChecklistText(tripDateLabel(settings))}</span>
+          <span>${escapeChecklistText(campTypeLabel(settings.campType))}</span>
+        </div>
 
-        <p class="saved-trip-progress-text">${stats.checked} of ${stats.total} packed</p>
-        <p class="saved-trip-edited">Last edited ${escapeChecklistText(lastEdited)}</p>
+        <div class="saved-trip-progress-row">
+          <span>${stats.checked} of ${stats.total} packed</span>
+          <span>Last edited ${escapeChecklistText(lastEdited)}</span>
+        </div>
 
         <div class="mini-progress-track" aria-hidden="true">
           <div class="mini-progress-fill" style="width:${stats.percent}%"></div>
@@ -926,13 +1107,64 @@ function renderSavedTrips() {
 
         <div class="saved-trip-actions">
           <button class="btn primary open-saved-trip" type="button" data-trip-id="${trip.id}">Open Trip</button>
+          <button class="btn secondary share-saved-trip" type="button" data-trip-id="${trip.id}">Share</button>
           <button class="btn secondary duplicate-saved-trip" type="button" data-trip-id="${trip.id}">Duplicate</button>
           <button class="btn secondary rename-saved-trip" type="button" data-trip-id="${trip.id}">Rename</button>
+          ${
+            archived
+              ? `<button class="btn secondary restore-saved-trip" type="button" data-trip-id="${trip.id}">Restore</button>`
+              : canArchive
+                ? `<button class="btn secondary archive-saved-trip" type="button" data-trip-id="${trip.id}">Archive</button>`
+                : ""
+          }
           <button class="btn secondary delete-saved-trip" type="button" data-trip-id="${trip.id}">Delete</button>
         </div>
+
+        <p class="saved-trip-action-status" data-status-for="${trip.id}" aria-live="polite"></p>
       </article>
     `;
-  }).join("");
+  };
+
+  const upcomingMarkup = upcomingTrips.length
+    ? upcomingTrips.map((trip) => renderTripCard(trip, false)).join("")
+    : `
+      <div class="saved-trip-empty compact-empty">
+        <h3>No upcoming trips</h3>
+        <p>Your archived trips are still available below.</p>
+      </div>
+    `;
+
+  const pastMarkup = pastTrips.length
+    ? pastTrips.map((trip) => renderTripCard(trip, true)).join("")
+    : `
+      <div class="saved-trip-empty compact-empty">
+        <p>Completed trips you archive will appear here.</p>
+      </div>
+    `;
+
+  savedTripsList.innerHTML = `
+    <div class="saved-trip-group">
+      <div class="saved-trip-group-heading">
+        <div>
+          <p class="eyebrow">Planning</p>
+          <h3>Upcoming Trips</h3>
+        </div>
+        <span>${upcomingTrips.length}</span>
+      </div>
+      <div class="saved-trips-grid">${upcomingMarkup}</div>
+    </div>
+
+    <div class="saved-trip-group">
+      <div class="saved-trip-group-heading">
+        <div>
+          <p class="eyebrow">History</p>
+          <h3>Past Trips</h3>
+        </div>
+        <span>${pastTrips.length}</span>
+      </div>
+      <div class="saved-trips-grid">${pastMarkup}</div>
+    </div>
+  `;
 
   savedTripsList.querySelectorAll(".open-saved-trip").forEach((button) => {
     button.addEventListener("click", () => {
@@ -958,6 +1190,20 @@ function renderSavedTrips() {
     });
   });
 
+  savedTripsList.querySelectorAll(".share-saved-trip").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const trip = loadSavedTrips().find((savedTrip) => savedTrip.id === button.dataset.tripId);
+      if (!trip) return;
+
+      const message = await shareSavedTrip(trip);
+      const status = savedTripsList.querySelector(`[data-status-for="${trip.id}"]`);
+
+      if (status && message) {
+        status.textContent = message;
+      }
+    });
+  });
+
   savedTripsList.querySelectorAll(".duplicate-saved-trip").forEach((button) => {
     button.addEventListener("click", () => {
       const trips = loadSavedTrips();
@@ -970,6 +1216,7 @@ function renderSavedTrips() {
       copy.name = `${source.name} Copy`;
       copy.createdAt = now;
       copy.updatedAt = now;
+      copy.archived = false;
 
       if (copy.planner) {
         copy.planner.tripName = copy.name;
@@ -1007,6 +1254,36 @@ function renderSavedTrips() {
       }
 
       writeSavedTrips(trips);
+      renderSavedTrips();
+    });
+  });
+
+  savedTripsList.querySelectorAll(".archive-saved-trip").forEach((button) => {
+    button.addEventListener("click", () => {
+      const trips = loadSavedTrips();
+      const trip = trips.find((savedTrip) => savedTrip.id === button.dataset.tripId);
+      if (!trip) return;
+
+      trip.archived = true;
+      trip.updatedAt = Date.now();
+
+      writeSavedTrips(trips);
+      trackEvent("archive_trip");
+      renderSavedTrips();
+    });
+  });
+
+  savedTripsList.querySelectorAll(".restore-saved-trip").forEach((button) => {
+    button.addEventListener("click", () => {
+      const trips = loadSavedTrips();
+      const trip = trips.find((savedTrip) => savedTrip.id === button.dataset.tripId);
+      if (!trip) return;
+
+      trip.archived = false;
+      trip.updatedAt = Date.now();
+
+      writeSavedTrips(trips);
+      trackEvent("restore_trip");
       renderSavedTrips();
     });
   });
@@ -1057,6 +1334,7 @@ saveTripBtn.addEventListener("click", () => {
         name: tripName,
         planner: cloneData(currentPlannerSettings),
         checklist: cloneData(currentChecklist),
+        archived: false,
         updatedAt: now
       };
     } else {
@@ -1072,6 +1350,7 @@ saveTripBtn.addEventListener("click", () => {
       name: tripName,
       planner: cloneData(currentPlannerSettings),
       checklist: cloneData(currentChecklist),
+      archived: false,
       createdAt: now,
       updatedAt: now
     });
@@ -1090,6 +1369,108 @@ saveTripBtn.addEventListener("click", () => {
   });
 });
 
+
+if (importSharedTrip) {
+  importSharedTrip.addEventListener("click", () => {
+    if (!pendingSharedTrip) return;
+
+    const trips = loadSavedTrips();
+    const now = Date.now();
+    const importedTrip = {
+      id: `trip-${now}-${Math.random().toString(36).slice(2, 8)}`,
+      name: pendingSharedTrip.name,
+      planner: cloneData(pendingSharedTrip.planner),
+      checklist: cloneData(pendingSharedTrip.checklist),
+      archived: false,
+      createdAt: now,
+      updatedAt: now
+    };
+
+    trips.push(importedTrip);
+    writeSavedTrips(trips);
+
+    currentTripId = importedTrip.id;
+    currentPlannerSettings = cloneData(importedTrip.planner);
+    currentChecklist = normalizeChecklist(importedTrip.checklist);
+
+    localStorage.setItem(ACTIVE_TRIP_KEY, currentTripId);
+    saveCurrentState();
+
+    populatePlannerForm(currentPlannerSettings);
+    renderChecklist();
+    updatePlannerPreview();
+    updateTripSummary();
+    renderSavedTrips();
+
+    closeSiteModal(sharedTripModal);
+    pendingSharedTrip = null;
+    history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+
+    trackEvent("import_shared_trip");
+    saveTripStatus.textContent = `Shared trip "${importedTrip.name}" saved.`;
+    document.getElementById("checklist").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+[dismissSharedTrip, closeSharedTripModal].forEach((button) => {
+  button?.addEventListener("click", () => {
+    closeSiteModal(sharedTripModal);
+  });
+});
+
+if (feedbackButton) {
+  feedbackButton.addEventListener("click", () => {
+    feedbackStatus.textContent = "";
+    openSiteModal(feedbackModal);
+    trackEvent("feedback_open");
+  });
+}
+
+if (closeFeedbackModal) {
+  closeFeedbackModal.addEventListener("click", () => {
+    closeSiteModal(feedbackModal);
+  });
+}
+
+if (feedbackForm) {
+  feedbackForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const useful = new FormData(feedbackForm).get("feedbackUseful");
+    const area = feedbackArea.value;
+
+    if (!useful || !area) return;
+
+    trackEvent("feedback_submit", {
+      useful: String(useful),
+      improvement_area: area
+    });
+
+    feedbackStatus.textContent = "Thanks — your feedback was sent.";
+    feedbackForm.reset();
+
+    window.setTimeout(() => {
+      closeSiteModal(feedbackModal);
+    }, 900);
+  });
+}
+
+[feedbackModal, sharedTripModal].forEach((modal) => {
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeSiteModal(modal);
+    }
+  });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+
+  closeSiteModal(feedbackModal);
+  closeSiteModal(sharedTripModal);
+});
+
+
 if (currentPlannerSettings) {
   populatePlannerForm(currentPlannerSettings);
 }
@@ -1104,6 +1485,7 @@ updatePlannerPreview();
 updateTripSummary();
 renderSavedTrips();
 attachStaticCollapsibleControls();
+checkForSharedTripLink();
 
 const useLocationBtn = document.getElementById("useLocationBtn");
 const campSearchForm = document.getElementById("campSearchForm");
