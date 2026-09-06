@@ -1479,19 +1479,14 @@ if (feedbackForm) {
       }
     }
 
-    feedbackStatus.textContent = comment
-      ? "Thanks — your rating was sent. Your short comment is saved locally for now."
-      : "Thanks — your feedback was sent.";
-
+    feedbackStatus.textContent = "";
     feedbackForm.reset();
 
     if (feedbackCharCount) {
       feedbackCharCount.textContent = "0/30";
     }
 
-    window.setTimeout(() => {
-      closeSiteModal(feedbackModal);
-    }, 1300);
+    closeSiteModal(feedbackModal);
   });
 }
 

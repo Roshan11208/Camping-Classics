@@ -86,3 +86,10 @@ or coordinates as custom event parameters.
 - Added an optional 30-character quick-comment field
 - Free-text comments are not sent to Google Analytics
 - The browser temporarily stores recent short comments locally until a dedicated feedback backend is connected
+
+
+## V30 feedback cleanup
+
+- Removed the note about local comment storage from the feedback modal
+- Removed the post-submit confirmation text
+- Feedback modal now closes immediately after submission

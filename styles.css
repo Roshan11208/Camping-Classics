@@ -2203,12 +2203,6 @@ body.modal-open {
   font-weight: 600;
 }
 
-.feedback-privacy-note {
-  margin: -8px 0 0;
-  color: var(--muted);
-  font-size: 0.76rem;
-  line-height: 1.45;
-}
 
 @media (max-width: 700px) {
   .feedback-fab {
