@@ -172,10 +172,9 @@ function updatePlannerPreview() {
 
 function checklistProgressStats(checklist = currentChecklist) {
   const items = Object.values(normalizeChecklist(checklist)).flat();
-  const activeItems = items.filter((item) => clampQuantity(item.quantity) > 0);
-  const checkedItems = activeItems.filter((item) => item.checked);
+  const checkedItems = items.filter((item) => item.checked);
 
-  const total = activeItems.length;
+  const total = items.length;
   const checked = checkedItems.length;
   const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
 
