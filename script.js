@@ -46,7 +46,7 @@ const offlineStatus = document.getElementById("offlineStatus");
 
 const expandAllSections = document.getElementById("expandAllSections");
 const collapseAllSections = document.getElementById("collapseAllSections");
-const clearQuantities = document.getElementById("clearQuantities");
+
 const printChecklist = document.getElementById("printChecklist");
 const tripSummaryCard = document.getElementById("tripSummaryCard");
 const tripSummaryName = document.getElementById("tripSummaryName");
@@ -921,21 +921,6 @@ if (printChecklist) {
   printChecklist.addEventListener("click", () => {
     trackEvent("print_checklist");
     window.print();
-  });
-}
-
-if (clearQuantities) {
-  clearQuantities.addEventListener("click", () => {
-    Object.values(currentChecklist).flat().forEach((item) => {
-      item.quantity = 0;
-      item.checked = false;
-    });
-
-    renderChecklist();
-    updatePlannerPreview();
-    renderSavedTrips();
-    saveTripStatus.textContent = "All checklist quantities set to 0.";
-    trackEvent("clear_checklist_quantities");
   });
 }
 

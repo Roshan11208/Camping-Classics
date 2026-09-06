@@ -119,3 +119,9 @@ or coordinates as custom event parameters.
 - Improved Share Trip with a dedicated share modal, Copy Link, and native Share only when the browser context safely supports it
 - Shared-trip import remains supported
 - Feedback behavior was left unchanged in this version
+
+
+## V34 checklist toolbar
+
+- Removed Set All Quantities to 0 from the checklist toolbar
+- Print Checklist now occupies that toolbar position next to Expand All and Collapse All
