@@ -14,6 +14,8 @@
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#285943" />
 </head>
 <body>
   <header class="site-header sidebar-header" id="sidebarHeader">
@@ -185,6 +187,7 @@
             <button class="btn secondary compact-btn" id="expandAllSections" type="button">Expand All</button>
             <button class="btn secondary compact-btn" id="collapseAllSections" type="button">Collapse All</button>
             <button class="btn secondary compact-btn" id="clearQuantities" type="button">Set All Quantities to 0</button>
+            <button class="btn secondary compact-btn" id="printChecklist" type="button">Print Checklist</button>
           </div>
         </div>
 
@@ -598,6 +601,34 @@
         <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
       </form>
     </div>
+  </div>
+
+
+  <div class="modal-backdrop" id="shareTripModal" hidden>
+    <div class="site-modal share-trip-modal" role="dialog" aria-modal="true" aria-labelledby="shareTripTitle">
+      <button class="modal-close" id="closeShareTripModal" type="button" aria-label="Close share trip">×</button>
+      <p class="eyebrow">Share Trip</p>
+      <h2 id="shareTripTitle">Share this trip</h2>
+      <p class="modal-copy">Send this link to your camping group. Opening it gives them a copy of the trip they can save and edit.</p>
+
+      <label class="share-link-label">
+        Trip link
+        <div class="share-link-row">
+          <input id="shareTripLink" type="text" readonly />
+          <button class="btn primary" id="copyShareTripLink" type="button">Copy Link</button>
+        </div>
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn secondary" id="nativeShareTrip" type="button">Share…</button>
+      </div>
+
+      <p class="share-status" id="shareTripStatus" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="offline-status" id="offlineStatus" hidden>
+    Offline mode — saved checklists still work
   </div>
 
   <script src="script.js"></script>

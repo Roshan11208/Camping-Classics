@@ -35,11 +35,19 @@ const sharedTripPreview = document.getElementById("sharedTripPreview");
 const importSharedTrip = document.getElementById("importSharedTrip");
 const dismissSharedTrip = document.getElementById("dismissSharedTrip");
 const closeSharedTripModal = document.getElementById("closeSharedTripModal");
+const shareTripModal = document.getElementById("shareTripModal");
+const closeShareTripModal = document.getElementById("closeShareTripModal");
+const shareTripLink = document.getElementById("shareTripLink");
+const copyShareTripLink = document.getElementById("copyShareTripLink");
+const nativeShareTrip = document.getElementById("nativeShareTrip");
+const shareTripStatus = document.getElementById("shareTripStatus");
+const offlineStatus = document.getElementById("offlineStatus");
 
 
 const expandAllSections = document.getElementById("expandAllSections");
 const collapseAllSections = document.getElementById("collapseAllSections");
 const clearQuantities = document.getElementById("clearQuantities");
+const printChecklist = document.getElementById("printChecklist");
 const tripSummaryCard = document.getElementById("tripSummaryCard");
 const tripSummaryName = document.getElementById("tripSummaryName");
 const tripSummaryDetails = document.getElementById("tripSummaryDetails");
@@ -158,7 +166,67 @@ function loadCurrentPlanner() {
 function saveCurrentState() {
   localStorage.setItem(CURRENT_CHECKLIST_KEY, JSON.stringify(currentChecklist));
 
-  if (currentPlannerSettings) {
+  
+if (copyShareTripLink) {
+  copyShareTripLink.addEventListener("click", async () => {
+    const value = shareTripLink.value;
+
+    try {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        shareTripLink.focus();
+        shareTripLink.select();
+        document.execCommand("copy");
+      }
+
+      shareTripStatus.textContent = "Link copied.";
+      trackEvent("share_trip", { method: "copy_link" });
+    } catch {
+      shareTripLink.focus();
+      shareTripLink.select();
+      shareTripStatus.textContent = "Select the link and copy it.";
+    }
+  });
+}
+
+if (nativeShareTrip) {
+  nativeShareTrip.addEventListener("click", async () => {
+    if (!navigator.share || !window.isSecureContext || location.protocol === "file:") return;
+
+    try {
+      await navigator.share({
+        title: `Camping Classics — ${shareTripModal.dataset.tripName || "Trip"}`,
+        text: "Here is my Camping Classics trip.",
+        url: shareTripLink.value
+      });
+
+      trackEvent("share_trip", { method: "native_share" });
+      closeSiteModal(shareTripModal);
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        shareTripStatus.textContent = "Sharing was unavailable. Use Copy Link instead.";
+      }
+    }
+  });
+}
+
+if (closeShareTripModal) {
+  closeShareTripModal.addEventListener("click", () => {
+    closeSiteModal(shareTripModal);
+  });
+}
+
+if (shareTripModal) {
+  shareTripModal.addEventListener("click", (event) => {
+    if (event.target === shareTripModal) {
+      closeSiteModal(shareTripModal);
+    }
+  });
+}
+
+
+if (currentPlannerSettings) {
     localStorage.setItem(CURRENT_PLANNER_KEY, JSON.stringify(currentPlannerSettings));
   }
 
@@ -848,6 +916,14 @@ if (collapseAllSections) {
   });
 }
 
+
+if (printChecklist) {
+  printChecklist.addEventListener("click", () => {
+    trackEvent("print_checklist");
+    window.print();
+  });
+}
+
 if (clearQuantities) {
   clearQuantities.addEventListener("click", () => {
     Object.values(currentChecklist).flat().forEach((item) => {
@@ -971,24 +1047,23 @@ function createTripShareUrl(trip) {
   return url.toString();
 }
 
-async function shareSavedTrip(trip) {
+function openShareTripModal(trip) {
   const url = createTripShareUrl(trip);
 
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(url);
-      trackEvent("share_trip", { method: "copy_link" });
-      return "Share link copied.";
-    }
+  shareTripModal.dataset.tripName = trip.name;
+  shareTripLink.value = url;
+  shareTripStatus.textContent = "";
 
-    window.prompt("Copy this trip link:", url);
-    trackEvent("share_trip", { method: "copy_prompt" });
-    return "Share link ready.";
-  } catch {
-    window.prompt("Copy this trip link:", url);
-    trackEvent("share_trip", { method: "copy_prompt" });
-    return "Share link ready.";
-  }
+  const canNativeShare =
+    window.isSecureContext &&
+    location.protocol !== "file:" &&
+    typeof navigator.share === "function";
+
+  nativeShareTrip.hidden = !canNativeShare;
+
+  openSiteModal(shareTripModal);
+  shareTripLink.focus();
+  shareTripLink.select();
 }
 
 function openSiteModal(modal) {
@@ -1205,20 +1280,11 @@ function renderSavedTrips() {
   });
 
   savedTripsList.querySelectorAll(".share-saved-trip").forEach((button) => {
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", () => {
       const trip = loadSavedTrips().find((savedTrip) => savedTrip.id === button.dataset.tripId);
       if (!trip) return;
 
-      const message = await shareSavedTrip(trip);
-      const status = savedTripsList.querySelector(`[data-status-for="${trip.id}"]`);
-
-      if (status && message) {
-        status.textContent = message;
-
-        window.setTimeout(() => {
-          status.textContent = "";
-        }, 1800);
-      }
+      openShareTripModal(trip);
     });
   });
 
@@ -1519,6 +1585,7 @@ document.addEventListener("keydown", (event) => {
 
   closeSiteModal(feedbackModal);
   closeSiteModal(sharedTripModal);
+  closeSiteModal(shareTripModal);
 });
 
 
@@ -2169,3 +2236,22 @@ menuBtn.addEventListener("click", () => {
 navMenu.querySelectorAll("a").forEach(link => {
   link.addEventListener("click", () => navMenu.classList.remove("open"));
 });
+
+
+function updateOfflineStatus() {
+  if (!offlineStatus) return;
+  offlineStatus.hidden = navigator.onLine;
+}
+
+window.addEventListener("online", updateOfflineStatus);
+window.addEventListener("offline", updateOfflineStatus);
+updateOfflineStatus();
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      // The site still works normally if service-worker registration fails.
+    });
+  });
+}
+

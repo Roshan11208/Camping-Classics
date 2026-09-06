@@ -109,3 +109,13 @@ or coordinates as custom event parameters.
 - Increasing quantity above 0 automatically checks the item
 - Reducing quantity to 0 automatically unchecks the item
 - Clicking the displayed quantity checks the item when quantity is above 0 and unchecks it when quantity is 0
+
+
+## V33 core usability upgrades
+
+- Added Print Checklist with print-friendly layout
+- Added offline support for the core site and saved checklists using a service worker
+- Added a web app manifest so the site can behave more like an installable app on supported devices
+- Improved Share Trip with a dedicated share modal, Copy Link, and native Share only when the browser context safely supports it
+- Shared-trip import remains supported
+- Feedback behavior was left unchanged in this version
