@@ -78,3 +78,11 @@ or coordinates as custom event parameters.
 - Completed trips can be archived into a Past Trips section and restored later
 - Added structured, anonymous feedback collection through Google Analytics (usefulness + improvement area only)
 - No free-text feedback, trip names, ZIP codes, or coordinates are sent as feedback analytics parameters
+
+
+## V29 feedback UI
+
+- Made the floating feedback button smaller and positioned it closer to the bottom-right edge
+- Added an optional 30-character quick-comment field
+- Free-text comments are not sent to Google Analytics
+- The browser temporarily stores recent short comments locally until a dedicated feedback backend is connected

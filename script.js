@@ -24,6 +24,8 @@ const feedbackModal = document.getElementById("feedbackModal");
 const feedbackForm = document.getElementById("feedbackForm");
 const feedbackArea = document.getElementById("feedbackArea");
 const feedbackStatus = document.getElementById("feedbackStatus");
+const feedbackComment = document.getElementById("feedbackComment");
+const feedbackCharCount = document.getElementById("feedbackCharCount");
 const closeFeedbackModal = document.getElementById("closeFeedbackModal");
 
 const sharedTripModal = document.getElementById("sharedTripModal");
@@ -1432,26 +1434,64 @@ if (closeFeedbackModal) {
   });
 }
 
+
+if (feedbackComment && feedbackCharCount) {
+  feedbackComment.addEventListener("input", () => {
+    feedbackCharCount.textContent = `${feedbackComment.value.length}/30`;
+  });
+}
+
 if (feedbackForm) {
   feedbackForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const useful = new FormData(feedbackForm).get("feedbackUseful");
     const area = feedbackArea.value;
+    const comment = (feedbackComment?.value || "").trim().slice(0, 30);
 
     if (!useful || !area) return;
 
     trackEvent("feedback_submit", {
       useful: String(useful),
-      improvement_area: area
+      improvement_area: area,
+      has_comment: Boolean(comment)
     });
 
-    feedbackStatus.textContent = "Thanks — your feedback was sent.";
+    if (comment) {
+      try {
+        const localComments = JSON.parse(
+          localStorage.getItem("camping-classics-feedback-comments-v29") || "[]"
+        );
+
+        localComments.push({
+          comment,
+          area,
+          useful: String(useful),
+          createdAt: Date.now()
+        });
+
+        localStorage.setItem(
+          "camping-classics-feedback-comments-v29",
+          JSON.stringify(localComments.slice(-50))
+        );
+      } catch {
+        // Ignore local-storage failures.
+      }
+    }
+
+    feedbackStatus.textContent = comment
+      ? "Thanks — your rating was sent. Your short comment is saved locally for now."
+      : "Thanks — your feedback was sent.";
+
     feedbackForm.reset();
+
+    if (feedbackCharCount) {
+      feedbackCharCount.textContent = "0/30";
+    }
 
     window.setTimeout(() => {
       closeSiteModal(feedbackModal);
-    }, 900);
+    }, 1300);
   });
 }
 

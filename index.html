@@ -580,6 +580,23 @@
           </select>
         </label>
 
+        <label>
+          Quick comment <span class="optional-label">(optional)</span>
+          <div class="feedback-comment-wrap">
+            <input
+              type="text"
+              id="feedbackComment"
+              maxlength="30"
+              placeholder="30 characters max"
+              autocomplete="off"
+            />
+            <span class="feedback-char-count" id="feedbackCharCount">0/30</span>
+          </div>
+        </label>
+        <p class="feedback-privacy-note">
+          Short comments are kept in your browser for now and are not sent to Google Analytics.
+        </p>
+
         <button class="btn primary" type="submit">Send Feedback</button>
         <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
       </form>

@@ -2159,3 +2159,62 @@ body.modal-open {
     padding: 24px 20px;
   }
 }
+
+
+/* V29 — smaller feedback control + short-comment field */
+.feedback-fab {
+  right: 10px;
+  bottom: 12px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(15, 42, 29, 0.16);
+}
+
+.feedback-comment-wrap {
+  position: relative;
+  margin-top: 8px;
+}
+
+.feedback-comment-wrap input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 58px 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.feedback-char-count {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.optional-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.feedback-privacy-note {
+  margin: -8px 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 700px) {
+  .feedback-fab {
+    right: 8px;
+    bottom: 10px;
+    padding: 8px 11px;
+    font-size: 0.8rem;
+  }
+}
