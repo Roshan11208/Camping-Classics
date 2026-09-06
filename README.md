@@ -93,3 +93,19 @@ or coordinates as custom event parameters.
 - Removed the note about local comment storage from the feedback modal
 - Removed the post-submit confirmation text
 - Feedback modal now closes immediately after submission
+
+
+## V31 share fix
+
+- Removed the native Web Share API call because some desktop browsers can crash when handed the long shared-trip URL
+- Share now copies the trip link directly to the clipboard
+- A brief “Share link copied.” status appears and disappears automatically
+- Shared-trip import behavior remains unchanged
+
+
+## V32 checkbox and quantity sync
+
+- Checking an item at quantity 0 automatically sets quantity to 1
+- Increasing quantity above 0 automatically checks the item
+- Reducing quantity to 0 automatically unchecks the item
+- Clicking the displayed quantity checks the item when quantity is above 0 and unchecks it when quantity is 0

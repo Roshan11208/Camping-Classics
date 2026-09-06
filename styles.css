@@ -2212,3 +2212,22 @@ body.modal-open {
     font-size: 0.8rem;
   }
 }
+
+
+/* V32 — synchronized checkbox and quantity behavior */
+.quantity-value-button {
+  appearance: none;
+  -webkit-appearance: none;
+  border-top: 0;
+  border-bottom: 0;
+  cursor: pointer;
+}
+
+.quantity-value-button:hover {
+  background: var(--alt);
+}
+
+.quantity-value-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}

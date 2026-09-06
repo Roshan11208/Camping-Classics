@@ -271,10 +271,13 @@ function renderChecklist() {
                     aria-label="Decrease ${escapeChecklistText(item.label)} quantity"
                   >−</button>
 
-                  <span
-                    class="quantity-value"
-                    aria-label="${escapeChecklistText(item.label)} quantity"
-                  >${item.quantity}</span>
+                  <button
+                    type="button"
+                    class="quantity-value quantity-value-button"
+                    data-category-index="${categoryIndex}"
+                    data-item-index="${itemIndex}"
+                    aria-label="Use ${escapeChecklistText(item.label)} quantity to update selection"
+                  >${item.quantity}</button>
 
                   <button
                     type="button"
@@ -422,10 +425,7 @@ function attachChecklistControls() {
       if (!target) return;
 
       target.item.quantity = Math.min(99, clampQuantity(target.item.quantity) + 1);
-
-      if (target.item.quantity > 0) {
-        target.item.checked = true;
-      }
+      target.item.checked = target.item.quantity > 0;
 
       renderChecklist();
       updatePlannerPreview();
@@ -444,6 +444,27 @@ function attachChecklistControls() {
 
       target.item.quantity = Math.max(0, clampQuantity(target.item.quantity) - 1);
 
+      if (target.item.quantity === 0) {
+        target.item.checked = false;
+      }
+
+      renderChecklist();
+      updatePlannerPreview();
+      renderSavedTrips();
+    });
+  });
+
+  checklistGrid.querySelectorAll(".quantity-value-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = getChecklistItemByIndexes(
+        Number(button.dataset.categoryIndex),
+        Number(button.dataset.itemIndex)
+      );
+
+      if (!target) return;
+
+      target.item.checked = clampQuantity(target.item.quantity) > 0;
+
       renderChecklist();
       updatePlannerPreview();
       renderSavedTrips();
@@ -460,8 +481,13 @@ function attachChecklistControls() {
       if (!target) return;
 
       target.item.checked = box.checked;
-      saveCurrentState();
-      updateProgress();
+
+      if (box.checked && clampQuantity(target.item.quantity) === 0) {
+        target.item.quantity = 1;
+      }
+
+      renderChecklist();
+      updatePlannerPreview();
       renderSavedTrips();
     });
   });
@@ -947,19 +973,8 @@ function createTripShareUrl(trip) {
 
 async function shareSavedTrip(trip) {
   const url = createTripShareUrl(trip);
-  const shareData = {
-    title: `Camping Classics — ${trip.name}`,
-    text: `Here is my Camping Classics trip: ${trip.name}`,
-    url
-  };
 
   try {
-    if (navigator.share) {
-      await navigator.share(shareData);
-      trackEvent("share_trip", { method: "native_share" });
-      return "Trip shared.";
-    }
-
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(url);
       trackEvent("share_trip", { method: "copy_link" });
@@ -969,12 +984,9 @@ async function shareSavedTrip(trip) {
     window.prompt("Copy this trip link:", url);
     trackEvent("share_trip", { method: "copy_prompt" });
     return "Share link ready.";
-  } catch (error) {
-    if (error?.name === "AbortError") {
-      return "";
-    }
-
+  } catch {
     window.prompt("Copy this trip link:", url);
+    trackEvent("share_trip", { method: "copy_prompt" });
     return "Share link ready.";
   }
 }
@@ -1202,6 +1214,10 @@ function renderSavedTrips() {
 
       if (status && message) {
         status.textContent = message;
+
+        window.setTimeout(() => {
+          status.textContent = "";
+        }, 1800);
       }
     });
   });
