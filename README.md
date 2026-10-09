@@ -25,7 +25,7 @@ No build command or dependencies are needed.
 - Compact trip planner
 - Packing-list search
 - Daily Plans hover and keyboard-focus explanation
-- Uncheck all items preserves trip settings, quantities, custom items, and day notes
+- Reset Checklist restores default items and keeps trip settings and day notes
 - Updated offline cache with network-first refresh
 
 ## Notes
@@ -35,3 +35,11 @@ Saved trips are stored in the current browser and website address. Trips saved o
 The campsite photo remains hosted on Unsplash, as in the supplied site. Campground search and analytics require internet access. The existing Google Analytics measurement ID is retained.
 
 If the old version remains visible after a completed deployment, hard-refresh the page. If necessary, unregister the old service worker in browser developer tools and reload. Avoid clearing browser storage if you want to keep saved trips.
+
+## Version 40
+
+- Sidebar collapses to icons until hovered, focused, or pinned open.
+- New-trip checklists start collapsed; generating a list opens them automatically.
+- Existing trips open with their checklist visible; Open Checklist is always available.
+- Removing items shows Undo. Multiple removals can be undone in reverse order until dismissed or the trip changes.
+- Reset Checklist restores the default packing list and clears progress while preserving the current trip details and daily notes.

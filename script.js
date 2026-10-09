@@ -189,6 +189,7 @@ let currentChecklist = loadCurrentChecklist();
 let currentPlannerSettings = loadCurrentPlanner();
 let currentTripId = localStorage.getItem(ACTIVE_TRIP_KEY) || null;
 let currentDayPlans = loadCurrentDayPlans();
+let removalHistory = [];
 
 function getAllChecklistItems() {
   return Object.values(currentChecklist).flat();
@@ -316,6 +317,10 @@ function renderChecklist() {
     })
     .join("");
 
+  if (removalHistory.some(entry => entry.checklist !== currentChecklist)) {
+    removalHistory = [];
+    document.getElementById("itemUndoToast").hidden = true;
+  }
   attachChecklistControls();
   attachCollapsibleControls();
   updateProgress();
@@ -512,6 +517,7 @@ function attachChecklistControls() {
 
       if (!target) return;
 
+      removalHistory.push({checklist:currentChecklist, category:target.category, index:target.itemIndex, item:cloneData(target.item)});
       currentChecklist[target.category].splice(target.itemIndex, 1);
 
       if (currentChecklist[target.category].length === 0) {
@@ -521,9 +527,33 @@ function attachChecklistControls() {
       renderChecklist();
       updatePlannerPreview();
       renderSavedTrips();
+      showRemovalUndo();
     });
   });
 }
+
+function showRemovalUndo() {
+  const entry = removalHistory.at(-1);
+  const toast = document.getElementById("itemUndoToast");
+  toast.hidden = !entry;
+  if (entry) document.getElementById("itemUndoMessage").textContent = `${entry.item.label} removed.`;
+}
+document.getElementById("undoRemoveItem").addEventListener("click", () => {
+  const entry = removalHistory.pop();
+  if (!entry || entry.checklist !== currentChecklist) { removalHistory = []; showRemovalUndo(); return; }
+  if (!currentChecklist[entry.category]) currentChecklist[entry.category] = [];
+  currentChecklist[entry.category].splice(Math.min(entry.index,currentChecklist[entry.category].length),0,entry.item);
+  renderChecklist();
+  updatePlannerPreview();
+  renderSavedTrips();
+  showRemovalUndo();
+  if (document.getElementById("itemUndoToast").hidden) document.getElementById("openChecklist").focus();
+});
+document.getElementById("dismissItemUndo").addEventListener("click", () => {
+  removalHistory = [];
+  showRemovalUndo();
+  document.getElementById("openChecklist").focus();
+});
 
 function plannerItem(label, quantity = 0) {
   return createChecklistItem(label, 0);
@@ -768,10 +798,18 @@ function togglePanel(button, body, expanded) {
   if (!button || !body) return;
   button.setAttribute("aria-expanded", String(expanded));
   body.hidden = !expanded;
+  if (body === checklistBody) {
+    const opener = document.getElementById("openChecklist");
+    opener.textContent = expanded ? "Collapse Checklist" : "Open Checklist";
+    opener.setAttribute("aria-expanded", String(expanded));
+  }
   if (button === masterChecklistToggle) {
     button.setAttribute("aria-label", expanded ? "Collapse everything below current trip" : "Expand everything below current trip");
   }
 }
+document.getElementById("openChecklist").addEventListener("click", () => {
+  togglePanel(masterChecklistToggle, checklistBody, checklistBody.hidden);
+});
 starterToggle?.addEventListener("click", () => {
   togglePanel(starterToggle, starterBody, starterToggle.getAttribute("aria-expanded") !== "true");
 });
@@ -1009,10 +1047,10 @@ if (printChecklist) {
 }
 
 resetChecklist.addEventListener("click", () => {
-  Object.values(currentChecklist).flat().forEach(item => { item.checked = false; });
+  currentChecklist = cloneData(defaultChecklist);
   renderChecklist();
   updateTripSummary();
-  saveTripStatus.textContent = "All items unchecked. Your trip, quantities, and daily plans are kept.";
+  saveTripStatus.textContent = "Checklist reset to default items. Your trip details and daily plans are kept.";
 });
 
 function loadSavedTrips() {
@@ -1388,6 +1426,7 @@ function renderSavedTrips() {
       localStorage.setItem(ACTIVE_TRIP_KEY, trip.id);
       currentPlannerSettings = trip.planner || null;
       currentChecklist = normalizeChecklist(trip.checklist);
+      togglePanel(masterChecklistToggle, checklistBody, true);
       currentDayPlans = normalizeDayPlans(trip.dayPlans, trip.planner?.days || 1);
 
       populatePlannerForm(currentPlannerSettings);
@@ -1608,6 +1647,7 @@ if (importSharedTrip) {
     currentTripId = importedTrip.id;
     currentPlannerSettings = cloneData(importedTrip.planner);
     currentChecklist = normalizeChecklist(importedTrip.checklist);
+    togglePanel(masterChecklistToggle, checklistBody, true);
     currentDayPlans = normalizeDayPlans(importedTrip.dayPlans, importedTrip.planner?.days || 1);
 
     localStorage.setItem(ACTIVE_TRIP_KEY, currentTripId);
@@ -1739,6 +1779,7 @@ updatePlannerPreview();
 updateTripSummary();
 renderSavedTrips();
 attachStaticCollapsibleControls();
+togglePanel(masterChecklistToggle, checklistBody, Boolean(currentPlannerSettings));
 checkForSharedTripLink();
 
 const useLocationBtn = document.getElementById("useLocationBtn");

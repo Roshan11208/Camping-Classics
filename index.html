@@ -165,7 +165,8 @@
           </div>
         </div>
 
-        <div id="checklistBody">
+        <button class="btn secondary checklist-open" id="openChecklist" type="button" aria-expanded="false" aria-controls="checklistBody">Open Checklist</button>
+        <div id="checklistBody" hidden>
         <div class="checklist-toolbar checklist-toolbar-no-search">
           <label class="packing-search">Find an item<input id="packingSearch" type="search" placeholder="Search your packing list…" /></label><div class="checklist-toolbar-actions">
             <button class="btn secondary compact-btn" id="expandAllSections" type="button">Expand All</button>
@@ -261,7 +262,7 @@
         </div>
 
         <div class="checklist-actions">
-          <button class="btn secondary" id="resetChecklist" type="button">Uncheck all items</button>
+          <button class="btn secondary" id="resetChecklist" type="button">Reset Checklist</button>
           <button class="btn primary" id="saveTripBtn" type="button">Save Current Trip</button>
           <span class="save-status" id="saveTripStatus" aria-live="polite"></span>
         </div>
@@ -639,6 +640,11 @@
     Offline mode — saved checklists still work
   </div>
 
+<div class="undo-toast" id="itemUndoToast" role="status" aria-live="polite" hidden>
+  <span id="itemUndoMessage"></span>
+  <button id="undoRemoveItem" type="button">Undo</button>
+  <button id="dismissItemUndo" type="button" aria-label="Dismiss removal notification">×</button>
+</div>
   <script src="script.js"></script>
 </body>
 </html>
