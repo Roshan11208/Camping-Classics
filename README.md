@@ -48,3 +48,7 @@ If the old version remains visible after a completed deployment, hard-refresh th
 
 - Removed the redundant Collapse Checklist button. The arrow beside Daily Plans controls collapsing. Open Checklist appears only while collapsed.
 - Undo restores focus to the item without scrolling to the checklist heading.
+
+## Version 42
+
+Expand All, Collapse All, and Print Checklist are on the left of the search field in a single row. Narrow screens stack the toolbar without overflowing.

@@ -167,12 +167,13 @@
 
         <button class="btn secondary checklist-open" id="openChecklist" type="button" aria-expanded="false" aria-controls="checklistBody">Open Checklist</button>
         <div id="checklistBody" hidden>
-        <div class="checklist-toolbar checklist-toolbar-no-search">
-          <label class="packing-search">Find an item<input id="packingSearch" type="search" placeholder="Search your packing list…" /></label><div class="checklist-toolbar-actions">
+        <div class="checklist-toolbar">
+          <div class="checklist-toolbar-actions">
             <button class="btn secondary compact-btn" id="expandAllSections" type="button">Expand All</button>
             <button class="btn secondary compact-btn" id="collapseAllSections" type="button">Collapse All</button>
             <button class="btn secondary compact-btn" id="printChecklist" type="button">Print Checklist</button>
           </div>
+          <label class="packing-search">Find an item<input id="packingSearch" type="search" placeholder="Search your packing list…" /></label>
         </div>
 
         <div class="packing-progress-card collapsible-card" data-collapsible="progress">
