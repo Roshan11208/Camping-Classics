@@ -1,4 +1,4 @@
-const CACHE_NAME = "camping-classics-v36";
+const CACHE_NAME = "camping-classics-v39";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -19,7 +19,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
+          .filter((key) => key.startsWith("camping-classics-") && key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
     )
@@ -50,7 +50,7 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => cached);
 
-      return cached || networkFetch;
+      return networkFetch.then(response => response || cached || Response.error());
     })
   );
 });

@@ -1009,25 +1009,10 @@ if (printChecklist) {
 }
 
 resetChecklist.addEventListener("click", () => {
-  currentChecklist = cloneData(defaultChecklist);
-  currentDayPlans = [];
-  currentPlannerSettings = null;
-  currentTripId = null;
-
-  localStorage.removeItem(CURRENT_CHECKLIST_KEY);
-  localStorage.removeItem(ACTIVE_TRIP_KEY);
-  localStorage.removeItem(CURRENT_PLANNER_KEY);
-  localStorage.removeItem(CURRENT_DAY_PLANS_KEY);
-
+  Object.values(currentChecklist).flat().forEach(item => { item.checked = false; });
   renderChecklist();
-  renderDayPlans();
-  updatePlannerPreview();
-
-  plannerSummary.textContent = "Fill out the planner and generate your list.";
-
-  if (customItemStatus) customItemStatus.textContent = "";
   updateTripSummary();
-  saveTripStatus.textContent = "Checklist reset.";
+  saveTripStatus.textContent = "All items unchecked. Your trip, quantities, and daily plans are kept.";
 });
 
 function loadSavedTrips() {
@@ -2406,3 +2391,40 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
   });
 }
 
+
+// Search keeps categories and item controls intact.
+const packingSearch = document.getElementById("packingSearch");
+function filterPackingItems() {
+  const query = (packingSearch?.value || "").trim().toLowerCase();
+  document.querySelectorAll("#checklistGrid .check-card").forEach(card => {
+    let matches = 0;
+    card.querySelectorAll(".check-item").forEach(row => {
+      row.hidden = !row.querySelector(".check-main span").textContent.toLowerCase().includes(query);
+      if (!row.hidden) matches++;
+    });
+    card.hidden = matches === 0;
+    if (query && matches) {
+      const toggle = card.querySelector(".collapsible-toggle");
+      if (toggle?.getAttribute("aria-expanded") === "false") toggle.click();
+    }
+  });
+}
+packingSearch?.addEventListener("input", filterPackingItems);
+new MutationObserver(filterPackingItems).observe(checklistGrid, {childList:true});
+// Optional browser agent integration shares the actual packing state.
+if (document.modelContext?.registerTool) {
+  const lifecycle = new AbortController();
+  try {
+    Promise.resolve(document.modelContext.registerTool({
+      name: "read_packing_progress", title: "Read packing progress",
+      description: "Read the current trip's packed and total item counts.",
+      inputSchema: {type:"object", properties:{}, additionalProperties:false},
+      annotations: {readOnlyHint:true},
+      execute(input) {
+        if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).length) throw new Error("Expected an empty object.");
+        return checklistProgressStats();
+      }
+    }, {signal:lifecycle.signal})).catch(() => {});
+    window.addEventListener("pagehide", () => lifecycle.abort(), {once:true});
+  } catch (_) {}
+}

@@ -2509,3 +2509,84 @@ body.modal-open {
 .day-planner-modal .day-planner-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));}
 @media(max-width:750px){.trip-summary-actions {margin-left:0;width:100%;justify-content:space-between}.day-planner-modal{padding:20px}}
 @media print {#checklistBody[hidden]{display:block!important} .trip-summary-actions{display:none!important}}
+
+/* Camping Classics: a clearer planning workspace */
+:root {--bg:#f4f6f4;--primary:#216047;--primary-dark:#163e32;--text:#19372c;--muted:#596d63;--border:#dce5df;--alt:#edf3ee;--shadow:0 8px 24px #17392a08}
+[hidden] {display:none!important}
+.skip-link {position:fixed;top:-80px;left:20px;z-index:1000;background:white;padding:12px 20px}
+.skip-link:focus {top:12px}
+:focus-visible {outline:3px solid #b87919;outline-offset:4px}
+.section {padding:40px 0;scroll-margin-top:30px}
+.section-heading {margin-bottom:22px;max-width:760px}
+h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
+.eyebrow {font-size:.78rem;letter-spacing:.12em;text-transform:uppercase}
+.trip-welcome {padding:30px 0 18px;background:var(--bg)}
+.trip-welcome .hero-grid {grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
+.trip-welcome h1 {font-size:clamp(2rem,3.8vw,3.3rem);line-height:1.08;letter-spacing:-.045em;margin:12px 0}
+.trip-welcome h1 em {font-family:Georgia,serif;font-weight:400;color:var(--primary);letter-spacing:-.035em}
+.trip-welcome .hero-copy {font-size:1rem;margin:15px 0;max-width:390px}
+.trip-welcome .hero-photo-wrap {height:245px;border-radius:18px;overflow:hidden;position:relative}
+.trip-welcome .hero-photo {height:100%;width:100%;object-fit:cover}
+.hero-actions {gap:10px;margin-top:18px}
+.btn {border-radius:9px;min-height:44px;font-size:.9rem;padding:10px 17px;box-shadow:none}
+.btn.primary {background:var(--primary);color:white}
+.btn.secondary {background:white;border:1px solid #cddbd2}
+.starter-panel {border-radius:14px;box-shadow:var(--shadow)}
+.master-toggle {padding:17px 22px;background:#fff}
+.master-toggle small {font-size:.875rem}
+.planner-card {grid-template-columns:1.55fr 1fr;gap:28px;padding:24px}
+.planner-form {grid-template-columns:1fr 1fr;gap:17px}
+.planner-form>label:first-child,.planner-date-grid,.planner-options,.planner-form>.full {grid-column:1/-1}
+.planner-form label {font-size:.9rem;gap:6px}
+.planner-form input,.planner-form select {width:100%;min-width:0;padding:10px 12px;border-radius:8px;font-size:1rem}
+.planner-form input[type=checkbox] {width:auto}
+.planner-result {border-radius:11px;border-top:4px solid #d6a34e;background:#f0f5ef;padding:22px}
+.planner-result h3 {margin-top:0}
+.result-list {font-size:.9rem}
+.check-card,.game-card,.guide-card,.saved-trip-card {border-radius:13px;box-shadow:var(--shadow)}
+.checklist-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+.trip-summary-card {border-left:4px solid var(--primary);border-radius:12px}
+.help-wrap {position:relative;display:inline-flex}
+.button-help {position:absolute;bottom:calc(100% + 10px);right:0;width:250px;padding:12px 15px;background:#19372c;color:white;font-size:.875rem;border-radius:9px;z-index:20;opacity:0;visibility:hidden;transition:opacity .15s;pointer-events:none}
+.help-wrap:hover .button-help,.help-wrap:focus-within .button-help {opacity:1;visibility:visible}
+.packing-search {display:grid;gap:5px;font-size:.875rem;font-weight:650;flex:1;max-width:360px}
+.packing-search input {padding:10px 12px;background:white;border:1px solid var(--border);border-radius:8px;width:100%;font:inherit}
+.checklist-toolbar {gap:18px;align-items:end;flex-wrap:wrap}
+.device-note {font-size:.875rem;color:var(--muted)}
+@media(min-width:901px){
+ body,body.sidebar-pinned {padding-left:220px}
+ .site-header.sidebar-header,.site-header.sidebar-header:hover,.site-header.sidebar-header:focus-within,body.sidebar-pinned .site-header.sidebar-header {width:220px;background:#163e32;color:#fff;box-shadow:none}
+ .sidebar-nav-wrap {padding:27px 14px}
+ .sidebar-brand {white-space:normal;gap:9px;margin-bottom:35px;line-height:1.25}
+ .brand-short {background:#edbc65;color:#163e32;border-radius:10px;width:40px;min-width:40px;height:40px}
+ .brand-full,.nav-label {opacity:1!important;transform:none!important;font-size:.95rem}
+ .sidebar-pin {display:none}
+ .sidebar-nav {gap:8px}
+ .sidebar-nav a {color:#e1ece5;padding:13px 12px;border-radius:8px}
+ .sidebar-nav a:hover,.sidebar-nav a:focus-visible,.sidebar-nav a.active {background:#2c5545;color:#fff}
+ .nav-icon {font-size:1.1rem}
+ .container {width:min(1120px,90%)}
+}
+@media(max-width:900px){
+ .trip-welcome {padding-top:24px}
+ .trip-welcome .hero-photo-wrap {height:210px}
+ .section {scroll-margin-top:90px}
+ .planner-card {grid-template-columns:1fr}
+ .planner-result .result-list {columns:2}
+}
+@media(max-width:600px){
+ .trip-welcome .hero-grid {grid-template-columns:1fr;gap:20px}
+ .trip-welcome .hero-photo-wrap {height:160px}
+ .trip-welcome h1 {font-size:2.45rem}
+ .hero-actions .btn {flex:1;text-align:center}
+ .section {padding:28px 0}
+ .planner-card {padding:17px}
+ .planner-form {gap:14px}
+ .planner-form>.planner-options {padding:12px}
+ .checklist-grid {grid-template-columns:1fr}
+ .packing-search {max-width:none;width:100%}
+ .checklist-toolbar-actions {flex-wrap:wrap}
+ .button-help {right:auto;left:0;width:230px}
+}
+@media(prefers-reduced-motion:reduce){html {scroll-behavior:auto}*,*::before,*::after {transition:none!important;animation:none!important}}
+@media print {body {padding-left:0!important}.packing-search,.skip-link {display:none!important}}

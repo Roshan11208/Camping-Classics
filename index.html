@@ -15,9 +15,11 @@
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
   <link rel="stylesheet" href="styles.css" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#285943" />
+  <meta name="theme-color" content="#163e32" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163e32'/%3E%3Cpath d='M5 25L16 6L27 25ZM12 25L16 17L20 25' fill='none' stroke='%23f0b95a' stroke-width='2'/%3E%3C/svg%3E" />
 </head>
 <body>
+<a class="skip-link" href="#planner">Skip to trip planner</a>
   <header class="site-header sidebar-header" id="sidebarHeader">
     <div class="nav sidebar-nav-wrap">
       <a class="brand sidebar-brand" href="#home" aria-label="Camping Classics home">
@@ -43,58 +45,27 @@
   </header>
 
   <main>
-    <section class="hero" id="home">
+    <section class="hero trip-welcome" id="home">
       <div class="container hero-grid">
-        <div>
-          <p class="eyebrow">Beginner-friendly camping help</p>
-          <h1>Plan your camping trip without forgetting the important stuff.</h1>
-          <p class="hero-copy">
-            Build a trip checklist, learn the basics, and find simple camping activities in one place.
-          </p>
-          <div class="hero-actions">
-            <a class="btn primary" href="#planner">Plan My Trip</a>
-            <a class="btn secondary" href="#checklist">Open Checklist</a>
-          </div>
-          <div class="stats">
-            <div><strong>5 min</strong><span>to start planning</span></div>
-            <div><strong>Beginner</strong><span>friendly guides</span></div>
-            <div><strong>Free</strong><span>to use</span></div>
-          </div>
+        <div><p class="eyebrow">A little planning. A lot of adventure.</p>
+          <h1>Your next campout<br><em>starts here.</em></h1>
+          <p class="hero-copy">Plan the days. Pack the essentials. Make room for the good stuff.</p>
+          <div class="hero-actions"><a class="btn primary" href="#planner">Plan a trip</a><a class="btn secondary" href="#saved-trips">My saved trips</a></div>
         </div>
-        <div class="hero-card">
-          <div class="hero-photo-wrap">
-            <img
-              class="hero-photo"
-              src="https://images.unsplash.com/photo-1760715650044-4e588c2dd2e2?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=75&w=1600"
-              alt="Tent at a mountain campsite around sunrise"
-              loading="eager"
-            />
-            <a
-              class="hero-photo-credit"
-              href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Photo by Alex Moliski on Unsplash
-            </a>
-          </div>
-          <h3>Ready for your next trip?</h3>
-          <p>Start with the planner and get a suggested packing list instantly.</p>
-        </div>
+        <div class="hero-photo-wrap"><img class="hero-photo" src="https://images.unsplash.com/photo-1760715650044-4e588c2dd2e2?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=75&w=1600" alt="Tent at a mountain campsite around sunrise" loading="eager"><a class="hero-photo-credit" href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
       </div>
     </section>
-
     <section class="section" id="planner">
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow">Trip Planner</p>
-          <h2>Create a starter packing list</h2>
-          <p>Choose a few details and we’ll suggest what to bring.</p>
+          <h2>Let’s plan your getaway</h2>
+          <p>Tell us who’s coming and what you have in mind. Your packing list starts here.</p>
         </div>
 
         <div class="starter-panel">
           <button id="starterToggle" class="master-toggle" type="button" aria-expanded="true" aria-controls="starterBody">
-            <span><strong>Starter Packing List Details</strong><small>Expand to edit your trip settings</small></span>
+            <span><strong>Your trip details</strong><small>People, dates, weather, and activities</small></span>
             <span class="collapsible-arrow" aria-hidden="true"><svg class="chevron-icon" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
           </button>
           <div id="starterBody">
@@ -189,14 +160,14 @@
           </div>
           <div class="trip-summary-details" id="tripSummaryDetails"></div>
           <div class="trip-summary-actions">
-            <button id="openDayPlanner" class="btn primary compact-btn" type="button">Daily Plans</button>
+            <span class="help-wrap"><button id="openDayPlanner" class="btn primary compact-btn" type="button" aria-describedby="dailyHelp">Daily Plans</button><span class="button-help" id="dailyHelp" role="tooltip">Plan activities and add notes for each day. Your changes save on this device.</span></span>
             <button id="masterChecklistToggle" type="button" class="master-chevron" aria-label="Collapse everything below current trip" aria-expanded="true" aria-controls="checklistBody"><svg class="chevron-icon" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           </div>
         </div>
 
         <div id="checklistBody">
         <div class="checklist-toolbar checklist-toolbar-no-search">
-          <div class="checklist-toolbar-actions">
+          <label class="packing-search">Find an item<input id="packingSearch" type="search" placeholder="Search your packing list…" /></label><div class="checklist-toolbar-actions">
             <button class="btn secondary compact-btn" id="expandAllSections" type="button">Expand All</button>
             <button class="btn secondary compact-btn" id="collapseAllSections" type="button">Collapse All</button>
             <button class="btn secondary compact-btn" id="printChecklist" type="button">Print Checklist</button>
@@ -290,7 +261,7 @@
         </div>
 
         <div class="checklist-actions">
-          <button class="btn secondary" id="resetChecklist" type="button">Reset Checklist</button>
+          <button class="btn secondary" id="resetChecklist" type="button">Uncheck all items</button>
           <button class="btn primary" id="saveTripBtn" type="button">Save Current Trip</button>
           <span class="save-status" id="saveTripStatus" aria-live="polite"></span>
         </div>
@@ -306,7 +277,7 @@
           <p>Save, share, duplicate, and revisit your camping plans. Completed trips can be archived so your upcoming trips stay organized.</p>
         </div>
 
-        <div class="saved-trips-grid" id="savedTripsList"></div>
+        <p class="device-note">Saved on this browser and device. Use Share Trip to take a plan with you.</p><div class="saved-trips-grid" id="savedTripsList"></div>
       </div>
     </section>
 
