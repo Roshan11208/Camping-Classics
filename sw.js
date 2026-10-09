@@ -1,4 +1,4 @@
-const CACHE_NAME = "camping-classics-v40";
+const CACHE_NAME = "camping-classics-v41";
 const CORE_ASSETS = [
   "./",
   "./index.html",

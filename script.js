@@ -547,12 +547,17 @@ document.getElementById("undoRemoveItem").addEventListener("click", () => {
   updatePlannerPreview();
   renderSavedTrips();
   showRemovalUndo();
-  if (document.getElementById("itemUndoToast").hidden) document.getElementById("openChecklist").focus();
+  if (document.getElementById("itemUndoToast").hidden) {
+    const categoryIndex = Object.keys(currentChecklist).indexOf(entry.category);
+    const itemIndex = currentChecklist[entry.category].indexOf(entry.item);
+    const restoredControl = checklistGrid.querySelector(`.remove-checklist-item[data-category-index="${categoryIndex}"][data-item-index="${itemIndex}"]`);
+    restoredControl?.focus({preventScroll:true});
+  }
 });
 document.getElementById("dismissItemUndo").addEventListener("click", () => {
   removalHistory = [];
   showRemovalUndo();
-  document.getElementById("openChecklist").focus();
+  document.getElementById("masterChecklistToggle").focus({preventScroll:true});
 });
 
 function plannerItem(label, quantity = 0) {
@@ -800,7 +805,8 @@ function togglePanel(button, body, expanded) {
   body.hidden = !expanded;
   if (body === checklistBody) {
     const opener = document.getElementById("openChecklist");
-    opener.textContent = expanded ? "Collapse Checklist" : "Open Checklist";
+    opener.hidden = expanded;
+    opener.textContent = "Open Checklist";
     opener.setAttribute("aria-expanded", String(expanded));
   }
   if (button === masterChecklistToggle) {

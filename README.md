@@ -43,3 +43,8 @@ If the old version remains visible after a completed deployment, hard-refresh th
 - Existing trips open with their checklist visible; Open Checklist is always available.
 - Removing items shows Undo. Multiple removals can be undone in reverse order until dismissed or the trip changes.
 - Reset Checklist restores the default packing list and clears progress while preserving the current trip details and daily notes.
+
+## Version 41
+
+- Removed the redundant Collapse Checklist button. The arrow beside Daily Plans controls collapsing. Open Checklist appears only while collapsed.
+- Undo restores focus to the item without scrolling to the checklist heading.
