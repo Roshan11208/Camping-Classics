@@ -52,3 +52,7 @@ If the old version remains visible after a completed deployment, hard-refresh th
 ## Version 42
 
 Expand All, Collapse All, and Print Checklist are on the left of the search field in a single row. Narrow screens stack the toolbar without overflowing.
+
+## Version 43
+
+Find an item is on the left; Expand All, Collapse All, and Print Checklist are on the right.
