@@ -125,3 +125,18 @@ or coordinates as custom event parameters.
 
 - Removed Set All Quantities to 0 from the checklist toolbar
 - Print Checklist now occupies that toolbar position next to Expand All and Collapse All
+
+
+## V35 — Day-by-Day Planner
+
+- New Day Planner section in the sidebar, between Trip Planner and Checklist.
+- Generates one editable card per trip day (up to 30), with optional dates from the trip's start date.
+- Custom day title and activity/notes field (1,200 characters per day).
+- Auto-saves to the current browser's localStorage; edits to opened saved trips are also stored on the active saved trip.
+- Day plans are included when saving, opening, duplicating, and sharing/importing trips.
+- Day plans are omitted from Google Analytics; only `day_plan_update` event name, day number, and edited field are tracked.
+- Cloudflare Pages works from the repo root: framework None, build command `exit 0`, output `.`.
+- Service worker cache version bumped to v35 so existing visitors can get the new styles/scripts.
+- Old saved trips without day notes remain compatible and start with empty notes for each day.
+- Shared-trip links include the text of notes. Share only with people you choose; unusually long links are blocked with a message.
+- Notes are saved only on the current browser/device unless included in a shared trip link. Clearing browser storage may remove unsynced notes.

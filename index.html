@@ -33,6 +33,7 @@
 
       <nav id="navMenu" class="sidebar-nav" aria-label="Main navigation">
         <a href="#planner"><span class="nav-icon" aria-hidden="true">🧭</span><span class="nav-label">Trip Planner</span></a>
+        <a href="#day-planner"><span class="nav-icon" aria-hidden="true">🗓</span><span class="nav-label">Day Planner</span></a>
         <a href="#checklist"><span class="nav-icon" aria-hidden="true">✓</span><span class="nav-label">Checklist</span></a>
         <a href="#saved-trips"><span class="nav-icon" aria-hidden="true">💾</span><span class="nav-label">Saved Trips</span></a>
         <a href="#guides"><span class="nav-icon" aria-hidden="true">📖</span><span class="nav-label">Guides</span></a>
@@ -166,7 +167,32 @@
       </div>
     </section>
 
-    <section class="section alt" id="checklist">
+    <section class="section alt" id="day-planner">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Day-by-Day Planner</p>
+          <h2>Make a plan for every day</h2>
+          <p>Organize what you want to do each day. Give the day a title and add your own notes, activities, and reminders.</p>
+        </div>
+        <div class="day-planner-headline">
+          <div>
+            <strong id="dayPlannerTripLabel">Your itinerary</strong>
+            <p id="dayPlannerCaption">Generate a trip above to get started.</p>
+          </div>
+          <span class="day-planner-status" id="dayPlannerStatus" role="status" aria-live="polite">Stored on this device</span>
+        </div>
+        <div id="dayPlannerGrid" class="day-planner-grid">
+          <div class="day-planner-empty">
+            <h3>Your daily plans start here</h3>
+            <p>Choose the number of days in the Trip Planner, then generate your packing list.</p>
+            <a href="#planner" class="btn primary">Create a Trip</a>
+          </div>
+        </div>
+        <p class="day-planner-note">Notes save automatically in this browser. Choose <strong>Save Current Trip</strong> in the checklist to keep them with your saved trip. Only people you send a Share Trip link to can see the notes in that link.</p>
+      </div>
+    </section>
+
+    <section class="section" id="checklist">
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow">Packing Checklist</p>

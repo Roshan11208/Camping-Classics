@@ -48,6 +48,10 @@ const expandAllSections = document.getElementById("expandAllSections");
 const collapseAllSections = document.getElementById("collapseAllSections");
 
 const printChecklist = document.getElementById("printChecklist");
+const dayPlannerGrid = document.getElementById("dayPlannerGrid");
+const dayPlannerTripLabel = document.getElementById("dayPlannerTripLabel");
+const dayPlannerCaption = document.getElementById("dayPlannerCaption");
+const dayPlannerStatus = document.getElementById("dayPlannerStatus");
 const tripSummaryCard = document.getElementById("tripSummaryCard");
 const tripSummaryName = document.getElementById("tripSummaryName");
 const tripSummaryDetails = document.getElementById("tripSummaryDetails");
@@ -55,6 +59,7 @@ const customItemStatus = document.getElementById("customItemStatus");
 
 const CURRENT_CHECKLIST_KEY = "camping-classics-current-checklist-v20";
 const CURRENT_PLANNER_KEY = "camping-classics-current-planner-v20";
+const CURRENT_DAY_PLANS_KEY = "camping-classics-current-day-plans-v35";
 const SAVED_TRIPS_KEY = "camping-classics-saved-trips-v15";
 const ACTIVE_TRIP_KEY = "camping-classics-active-trip-v21";
 
@@ -167,66 +172,8 @@ function saveCurrentState() {
   localStorage.setItem(CURRENT_CHECKLIST_KEY, JSON.stringify(currentChecklist));
 
   
-if (copyShareTripLink) {
-  copyShareTripLink.addEventListener("click", async () => {
-    const value = shareTripLink.value;
-
-    try {
-      if (navigator.clipboard?.writeText && window.isSecureContext) {
-        await navigator.clipboard.writeText(value);
-      } else {
-        shareTripLink.focus();
-        shareTripLink.select();
-        document.execCommand("copy");
-      }
-
-      shareTripStatus.textContent = "Link copied.";
-      trackEvent("share_trip", { method: "copy_link" });
-    } catch {
-      shareTripLink.focus();
-      shareTripLink.select();
-      shareTripStatus.textContent = "Select the link and copy it.";
-    }
-  });
-}
-
-if (nativeShareTrip) {
-  nativeShareTrip.addEventListener("click", async () => {
-    if (!navigator.share || !window.isSecureContext || location.protocol === "file:") return;
-
-    try {
-      await navigator.share({
-        title: `Camping Classics — ${shareTripModal.dataset.tripName || "Trip"}`,
-        text: "Here is my Camping Classics trip.",
-        url: shareTripLink.value
-      });
-
-      trackEvent("share_trip", { method: "native_share" });
-      closeSiteModal(shareTripModal);
-    } catch (error) {
-      if (error?.name !== "AbortError") {
-        shareTripStatus.textContent = "Sharing was unavailable. Use Copy Link instead.";
-      }
-    }
-  });
-}
-
-if (closeShareTripModal) {
-  closeShareTripModal.addEventListener("click", () => {
-    closeSiteModal(shareTripModal);
-  });
-}
-
-if (shareTripModal) {
-  shareTripModal.addEventListener("click", (event) => {
-    if (event.target === shareTripModal) {
-      closeSiteModal(shareTripModal);
-    }
-  });
-}
-
-
-if (currentPlannerSettings) {
+localStorage.setItem(CURRENT_DAY_PLANS_KEY, JSON.stringify(currentDayPlans));
+  if (currentPlannerSettings) {
     localStorage.setItem(CURRENT_PLANNER_KEY, JSON.stringify(currentPlannerSettings));
   }
 
@@ -241,6 +188,7 @@ if (currentPlannerSettings) {
 let currentChecklist = loadCurrentChecklist();
 let currentPlannerSettings = loadCurrentPlanner();
 let currentTripId = localStorage.getItem(ACTIVE_TRIP_KEY) || null;
+let currentDayPlans = loadCurrentDayPlans();
 
 function getAllChecklistItems() {
   return Object.values(currentChecklist).flat();
@@ -670,6 +618,107 @@ function formatDateOnly(value) {
   }).format(date);
 }
 
+// User-written notes stay on this device and are only shared when the user shares a trip.
+function normalizeDayPlans(rawPlans, days = 30) {
+  const total = Math.min(30, Math.max(0, Number.parseInt(days, 10) || 0));
+  const source = Array.isArray(rawPlans) ? rawPlans : [];
+  return Array.from({ length: total }, (_, dayIndex) => {
+    const item = source[dayIndex];
+    return {
+      title: typeof item?.title === "string" ? item.title.slice(0, 80) : "",
+      notes: typeof item?.notes === "string" ? item.notes.slice(0, 1200) : ""
+    };
+  });
+}
+
+function loadCurrentDayPlans() {
+  try {
+    const saved = localStorage.getItem(CURRENT_DAY_PLANS_KEY);
+    return saved ? normalizeDayPlans(JSON.parse(saved)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function dayDateLabel(startDate, offset) {
+  const start = parseDateOnly(startDate);
+  if (!start) return "";
+  start.setUTCDate(start.getUTCDate() + offset);
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short", month: "short", day: "numeric", timeZone: "UTC"
+  }).format(start);
+}
+
+function renderDayPlans() {
+  if (!dayPlannerGrid) return;
+  if (!currentPlannerSettings) {
+    dayPlannerTripLabel.textContent = "Your itinerary";
+    dayPlannerCaption.textContent = "Generate a trip above to get started.";
+    dayPlannerStatus.textContent = "Stored on this device";
+    dayPlannerGrid.innerHTML = `
+      <div class="day-planner-empty">
+        <h3>Your daily plans start here</h3>
+        <p>Choose the number of days in the Trip Planner, then generate your packing list.</p>
+        <a href="#planner" class="btn primary">Create a Trip</a>
+      </div>`;
+    return;
+  }
+
+  const days = Math.min(30, Math.max(1, Number(currentPlannerSettings.days) || 1));
+  currentDayPlans = normalizeDayPlans(currentDayPlans, days);
+  dayPlannerTripLabel.textContent = currentPlannerSettings.tripName?.trim() || "Your camping trip";
+  dayPlannerCaption.textContent = `${days} day${days === 1 ? "" : "s"} to plan`;
+  dayPlannerStatus.textContent = "Auto-saved on this device";
+
+  dayPlannerGrid.innerHTML = currentDayPlans.map((day, i) => {
+    const date = dayDateLabel(currentPlannerSettings.startDate, i);
+    return `
+      <article class="day-plan-card" data-day-index="${i}">
+        <div class="day-plan-card-head">
+          <h3>Day ${i + 1}</h3>
+          ${date ? `<span class="day-plan-date">${escapeChecklistText(date)}</span>` : ""}
+        </div>
+        <label for="day-title-${i}">Day title
+          <input id="day-title-${i}" class="day-title-input" type="text" maxlength="80"
+            placeholder="e.g. Explore the lake" value="${escapeChecklistText(day.title)}" />
+        </label>
+        <label for="day-notes-${i}">Activities & notes
+          <textarea id="day-notes-${i}" class="day-notes-input" maxlength="1200"
+            placeholder="Morning: Arrive and set up camp\nAfternoon: Walk the nature trail\nEvening: Play games at the campsite">${escapeChecklistText(day.notes)}</textarea>
+        </label>
+      </article>`;
+  }).join("");
+}
+
+if (dayPlannerGrid) {
+  dayPlannerGrid.addEventListener("input", (event) => {
+    const field = event.target;
+    if (!field.matches(".day-title-input, .day-notes-input")) return;
+    const card = field.closest(".day-plan-card");
+    const i = Number(card?.dataset.dayIndex);
+    if (!Number.isInteger(i) || !currentDayPlans[i]) return;
+
+    if (field.classList.contains("day-title-input")) {
+      currentDayPlans[i].title = field.value.slice(0, 80);
+    } else {
+      currentDayPlans[i].notes = field.value.slice(0, 1200);
+    }
+    saveCurrentState();
+    dayPlannerStatus.textContent = "Auto-saved on this device";
+  });
+
+  dayPlannerGrid.addEventListener("change", (event) => {
+    const field = event.target;
+    if (!field.matches(".day-title-input, .day-notes-input")) return;
+    const card = field.closest(".day-plan-card");
+    trackEvent("day_plan_update", {
+      day_number: Number(card?.dataset.dayIndex) + 1,
+      field: field.classList.contains("day-title-input") ? "title" : "notes"
+    });
+    renderSavedTrips();
+  });
+}
+
 function tripDateLabel(settings) {
   if (settings?.startDate && settings?.endDate) {
     return `${formatDateOnly(settings.startDate)} – ${formatDateOnly(settings.endDate)}`;
@@ -839,6 +888,7 @@ tripForm.addEventListener("submit", (event) => {
   }
 
   currentChecklist = normalizeChecklist(generated);
+  currentDayPlans = normalizeDayPlans([], currentPlannerSettings.days);
 
   trackEvent("generate_packing_list", {
     campers: campers,
@@ -853,6 +903,7 @@ tripForm.addEventListener("submit", (event) => {
 
   saveCurrentState();
   renderChecklist();
+  renderDayPlans();
   updatePlannerPreview();
 
   const displayName = tripName || "Your trip";
@@ -926,14 +977,17 @@ if (printChecklist) {
 
 resetChecklist.addEventListener("click", () => {
   currentChecklist = cloneData(defaultChecklist);
+  currentDayPlans = [];
   currentPlannerSettings = null;
   currentTripId = null;
 
   localStorage.removeItem(CURRENT_CHECKLIST_KEY);
   localStorage.removeItem(ACTIVE_TRIP_KEY);
   localStorage.removeItem(CURRENT_PLANNER_KEY);
+  localStorage.removeItem(CURRENT_DAY_PLANS_KEY);
 
   renderChecklist();
+  renderDayPlans();
   updatePlannerPreview();
 
   plannerSummary.textContent = "Fill out the planner and generate your list.";
@@ -977,6 +1031,7 @@ function persistActiveTrip() {
     name: currentPlannerSettings.tripName?.trim() || trips[index].name,
     planner: cloneData(currentPlannerSettings),
     checklist: cloneData(currentChecklist),
+    dayPlans: cloneData(currentDayPlans),
     updatedAt: Date.now()
   };
 
@@ -1023,7 +1078,8 @@ function createTripShareUrl(trip) {
     v: 1,
     name: trip.name,
     planner: trip.planner || {},
-    checklist: normalizeChecklist(trip.checklist)
+    checklist: normalizeChecklist(trip.checklist),
+    dayPlans: normalizeDayPlans(trip.dayPlans, trip.planner?.days || 1)
   };
 
   const url = new URL(window.location.href);
@@ -1034,17 +1090,21 @@ function createTripShareUrl(trip) {
 
 function openShareTripModal(trip) {
   const url = createTripShareUrl(trip);
+  const tooLong = url.length > 18000;
 
   shareTripModal.dataset.tripName = trip.name;
-  shareTripLink.value = url;
-  shareTripStatus.textContent = "";
+  shareTripLink.value = tooLong ? "" : url;
+  shareTripStatus.textContent = tooLong
+    ? "This trip contains too much text for a reliable share link. Shorten some day notes to share it."
+    : "";
+  copyShareTripLink.disabled = tooLong;
 
   const canNativeShare =
     window.isSecureContext &&
     location.protocol !== "file:" &&
     typeof navigator.share === "function";
 
-  nativeShareTrip.hidden = !canNativeShare;
+  nativeShareTrip.hidden = !canNativeShare || tooLong;
 
   openSiteModal(shareTripModal);
   shareTripLink.focus();
@@ -1066,6 +1126,66 @@ function closeSiteModal(modal) {
   }
 }
 
+if (copyShareTripLink) {
+  copyShareTripLink.addEventListener("click", async () => {
+    const value = shareTripLink.value;
+
+    try {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        shareTripLink.focus();
+        shareTripLink.select();
+        document.execCommand("copy");
+      }
+
+      shareTripStatus.textContent = "Link copied.";
+      trackEvent("share_trip", { method: "copy_link" });
+    } catch {
+      shareTripLink.focus();
+      shareTripLink.select();
+      shareTripStatus.textContent = "Select the link and copy it.";
+    }
+  });
+}
+
+if (nativeShareTrip) {
+  nativeShareTrip.addEventListener("click", async () => {
+    if (!navigator.share || !window.isSecureContext || location.protocol === "file:") return;
+
+    try {
+      await navigator.share({
+        title: `Camping Classics — ${shareTripModal.dataset.tripName || "Trip"}`,
+        text: "Here is my Camping Classics trip.",
+        url: shareTripLink.value
+      });
+
+      trackEvent("share_trip", { method: "native_share" });
+      closeSiteModal(shareTripModal);
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        shareTripStatus.textContent = "Sharing was unavailable. Use Copy Link instead.";
+      }
+    }
+  });
+}
+
+if (closeShareTripModal) {
+  closeShareTripModal.addEventListener("click", () => {
+    closeSiteModal(shareTripModal);
+  });
+}
+
+if (shareTripModal) {
+  shareTripModal.addEventListener("click", (event) => {
+    if (event.target === shareTripModal) {
+      closeSiteModal(shareTripModal);
+    }
+  });
+}
+
+
+
 let pendingSharedTrip = null;
 
 function showSharedTripImport(payload) {
@@ -1082,7 +1202,8 @@ function showSharedTripImport(payload) {
       ...settings,
       tripName: name
     },
-    checklist
+    checklist,
+    dayPlans: normalizeDayPlans(payload.dayPlans, settings.days || 1)
   };
 
   sharedTripTitle.textContent = name;
@@ -1249,9 +1370,11 @@ function renderSavedTrips() {
       localStorage.setItem(ACTIVE_TRIP_KEY, trip.id);
       currentPlannerSettings = trip.planner || null;
       currentChecklist = normalizeChecklist(trip.checklist);
+      currentDayPlans = normalizeDayPlans(trip.dayPlans, trip.planner?.days || 1);
 
       populatePlannerForm(currentPlannerSettings);
       renderChecklist();
+      renderDayPlans();
       updatePlannerPreview();
       updateTripSummary();
 
@@ -1383,6 +1506,9 @@ saveTripBtn.addEventListener("click", () => {
     ...collectPlannerSettings()
   };
 
+  currentDayPlans = normalizeDayPlans(currentDayPlans, currentPlannerSettings.days);
+  renderDayPlans();
+
   let tripName = currentPlannerSettings.tripName.trim();
 
   if (!tripName) {
@@ -1403,6 +1529,7 @@ saveTripBtn.addEventListener("click", () => {
         name: tripName,
         planner: cloneData(currentPlannerSettings),
         checklist: cloneData(currentChecklist),
+        dayPlans: cloneData(currentDayPlans),
         archived: false,
         updatedAt: now
       };
@@ -1419,6 +1546,7 @@ saveTripBtn.addEventListener("click", () => {
       name: tripName,
       planner: cloneData(currentPlannerSettings),
       checklist: cloneData(currentChecklist),
+      dayPlans: cloneData(currentDayPlans),
       archived: false,
       createdAt: now,
       updatedAt: now
@@ -1450,6 +1578,7 @@ if (importSharedTrip) {
       name: pendingSharedTrip.name,
       planner: cloneData(pendingSharedTrip.planner),
       checklist: cloneData(pendingSharedTrip.checklist),
+      dayPlans: cloneData(pendingSharedTrip.dayPlans),
       archived: false,
       createdAt: now,
       updatedAt: now
@@ -1461,12 +1590,14 @@ if (importSharedTrip) {
     currentTripId = importedTrip.id;
     currentPlannerSettings = cloneData(importedTrip.planner);
     currentChecklist = normalizeChecklist(importedTrip.checklist);
+    currentDayPlans = normalizeDayPlans(importedTrip.dayPlans, importedTrip.planner?.days || 1);
 
     localStorage.setItem(ACTIVE_TRIP_KEY, currentTripId);
     saveCurrentState();
 
     populatePlannerForm(currentPlannerSettings);
     renderChecklist();
+    renderDayPlans();
     updatePlannerPreview();
     updateTripSummary();
     renderSavedTrips();
@@ -1584,6 +1715,7 @@ if (currentTripId && !loadSavedTrips().some((trip) => trip.id === currentTripId)
 }
 
 renderChecklist();
+renderDayPlans();
 updatePlannerPreview();
 updateTripSummary();
 renderSavedTrips();
