@@ -1075,7 +1075,7 @@ customItemForm.addEventListener("submit", (event) => {
   if (!label) return;
 
   const category = customItemCategory.value || "Extras";
-  const quantity = 1;
+  const quantity = 0;
 
   if (!currentChecklist[category]) {
     currentChecklist[category] = [];
