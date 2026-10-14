@@ -15,7 +15,6 @@ const resetChecklist = document.getElementById("resetChecklist");
 const customItemForm = document.getElementById("customItemForm");
 const customItemName = document.getElementById("customItemName");
 const customItemCategory = document.getElementById("customItemCategory");
-const customItemQuantity = document.getElementById("customItemQuantity");
 const saveTripBtn = document.getElementById("saveTripBtn");
 const saveTripStatus = document.getElementById("saveTripStatus");
 const savedTripsList = document.getElementById("savedTripsList");
@@ -606,6 +605,7 @@ function populatePlannerForm(settings) {
   document.getElementById("cookAtCamp").checked = Boolean(settings.cookAtCamp);
   document.getElementById("noWater").checked = Boolean(settings.noWater);
 
+  syncPlannerDates("restore", false);
   document.querySelectorAll('input[name="activity"]').forEach((input) => {
     input.checked = Array.isArray(settings.activities)
       ? settings.activities.includes(input.value)
@@ -830,14 +830,91 @@ openDayPlanner?.addEventListener("click", () => {
   dayPlannerModal?.querySelector(".site-modal")?.focus();
   trackEvent("day_planner_open");
 });
-closeDayPlannerModal?.addEventListener("click", () => closeSiteModal(dayPlannerModal));
+function finishDayPlans() {
+  saveCurrentState();
+  closeSiteModal(dayPlannerModal);
+  openDayPlanner?.focus({preventScroll:true});
+}
+closeDayPlannerModal?.addEventListener("click", finishDayPlans);
+document.getElementById("doneDayPlanner").addEventListener("click", finishDayPlans);
 dayPlannerModal?.addEventListener("click", (event) => {
   if (event.target === dayPlannerModal) closeSiteModal(dayPlannerModal);
+});
+
+const plannerDaysInput = document.getElementById("days");
+const plannerStartInput = document.getElementById("startDate");
+const plannerEndInput = document.getElementById("endDate");
+const tripDateStatus = document.getElementById("tripDateStatus");
+let lastValidTripDates = {days:plannerDaysInput.value, startDate:plannerStartInput.value, endDate:plannerEndInput.value};
+
+function datePlusDays(value, offset) {
+  const date = parseDateOnly(value);
+  if (!date) return "";
+  date.setUTCDate(date.getUTCDate() + offset);
+  return date.toISOString().slice(0, 10);
+}
+
+function syncPlannerDates(changedField, updateCurrent = true) {
+  let days = Math.min(30, Math.max(1, Math.trunc(Number(plannerDaysInput.value) || 1)));
+  let startDate = plannerStartInput.value;
+  let endDate = plannerEndInput.value;
+  let message = "";
+  if (changedField === "startDate" && !startDate) endDate = "";
+  if (!startDate && endDate) startDate = datePlusDays(endDate, 1 - days);
+  if (startDate) {
+    if (changedField === "days" || !endDate) endDate = datePlusDays(startDate, days - 1);
+    if (endDate < startDate) {
+      endDate = changedField === "startDate" ? datePlusDays(startDate, days - 1) : startDate;
+      message = "End date adjusted: it cannot be before the start date.";
+    }
+    const count = inclusiveDaysBetween(startDate, endDate);
+    if (count > 30) {
+      endDate = datePlusDays(startDate, 29);
+      message = "Trips can be up to 30 days. The end date has been adjusted.";
+    }
+    days = inclusiveDaysBetween(startDate, endDate);
+  }
+  if (updateCurrent && currentPlannerSettings && days < currentPlannerSettings.days &&
+      currentDayPlans.slice(days).some(day => day.title.trim() || day.notes.trim()) &&
+      !window.confirm(`Shortening this trip to ${days} days removes notes for the later days. Continue?`)) {
+    plannerDaysInput.value = lastValidTripDates.days;
+    plannerStartInput.value = lastValidTripDates.startDate;
+    plannerEndInput.value = lastValidTripDates.endDate;
+    tripDateStatus.textContent = "Trip length kept so your daily notes stay intact.";
+    return false;
+  }
+  plannerDaysInput.value = String(days);
+  plannerStartInput.value = startDate;
+  plannerEndInput.value = endDate;
+  plannerEndInput.min = startDate;
+  plannerEndInput.max = startDate ? datePlusDays(startDate, 29) : "";
+  plannerEndInput.setCustomValidity("");
+  lastValidTripDates = {days:String(days),startDate,endDate};
+  tripDateStatus.textContent = message || `${days} day${days === 1 ? "" : "s"} · Includes arrival and departure day.`;
+  if (updateCurrent && currentPlannerSettings) {
+    currentPlannerSettings.days = days;
+    currentPlannerSettings.startDate = startDate;
+    currentPlannerSettings.endDate = endDate;
+    currentDayPlans = normalizeDayPlans(currentDayPlans, days);
+    renderDayPlans();
+    saveCurrentState();
+    updateTripSummary();
+    renderSavedTrips();
+  }
+  return true;
+}
+[plannerStartInput, plannerEndInput, plannerDaysInput].forEach(input => {
+  input.addEventListener("input", () => {
+    if (input === plannerDaysInput && !input.value) return;
+    syncPlannerDates(input.id);
+  });
+  input.addEventListener("change", () => syncPlannerDates(input.id));
 });
 
 tripForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
+  if (!syncPlannerDates("submit")) return;
   currentPlannerSettings = collectPlannerSettings();
   currentTripId = null;
   localStorage.removeItem(ACTIVE_TRIP_KEY);
@@ -963,7 +1040,7 @@ tripForm.addEventListener("submit", (event) => {
   }
 
   currentChecklist = normalizeChecklist(generated);
-  currentDayPlans = normalizeDayPlans([], currentPlannerSettings.days);
+  currentDayPlans = normalizeDayPlans(currentDayPlans, currentPlannerSettings.days);
 
   trackEvent("generate_packing_list", {
     campers: campers,
@@ -998,7 +1075,7 @@ customItemForm.addEventListener("submit", (event) => {
   if (!label) return;
 
   const category = customItemCategory.value || "Extras";
-  const quantity = clampQuantity(customItemQuantity.value);
+  const quantity = 1;
 
   if (!currentChecklist[category]) {
     currentChecklist[category] = [];
@@ -1016,11 +1093,10 @@ customItemForm.addEventListener("submit", (event) => {
   }
 
   currentChecklist[category].push(
-    createChecklistItem(label, quantity, true, true)
+    createChecklistItem(label, quantity, false, true)
   );
 
   customItemName.value = "";
-  customItemQuantity.value = "0";
   customItemStatus.textContent = `"${label}" added to ${category}.`;
 
   renderChecklist();
@@ -1703,6 +1779,15 @@ if (feedbackComment && feedbackCharCount) {
   });
 }
 
+const feedbackConfirmation = document.getElementById("feedbackConfirmation");
+function dismissFeedbackConfirmation() {
+  closeSiteModal(feedbackConfirmation);
+  feedbackButton?.focus({preventScroll:true});
+}
+document.getElementById("closeFeedbackConfirmation").addEventListener("click", dismissFeedbackConfirmation);
+feedbackConfirmation.addEventListener("click", event => {
+  if (event.target === feedbackConfirmation) dismissFeedbackConfirmation();
+});
 if (feedbackForm) {
   feedbackForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -1749,6 +1834,8 @@ if (feedbackForm) {
     }
 
     closeSiteModal(feedbackModal);
+    openSiteModal(feedbackConfirmation);
+    document.getElementById("closeFeedbackConfirmation").focus({preventScroll:true});
   });
 }
 
@@ -1767,11 +1854,14 @@ document.addEventListener("keydown", (event) => {
   closeSiteModal(sharedTripModal);
   closeSiteModal(shareTripModal);
   closeSiteModal(dayPlannerModal);
+  if (!feedbackConfirmation.hidden) dismissFeedbackConfirmation();
 });
 
 
 if (currentPlannerSettings) {
   populatePlannerForm(currentPlannerSettings);
+} else {
+  syncPlannerDates("restore", false);
 }
 
 if (currentTripId && !loadSavedTrips().some((trip) => trip.id === currentTripId)) {
@@ -1793,6 +1883,20 @@ const campSearchForm = document.getElementById("campSearchForm");
 const campSearchInput = document.getElementById("campSearchInput");
 const finderStatus = document.getElementById("finderStatus");
 const campResults = document.getElementById("campResults");
+const showCampResults = document.getElementById("showCampResults");
+const hideCampResults = document.getElementById("hideCampResults");
+hideCampResults.addEventListener("click", () => {
+  campResults.hidden = true;
+  showCampResults.hidden = false;
+  showCampResults.setAttribute("aria-expanded", "false");
+  showCampResults.focus({preventScroll:true});
+});
+showCampResults.addEventListener("click", () => {
+  campResults.hidden = false;
+  showCampResults.hidden = true;
+  showCampResults.setAttribute("aria-expanded", "true");
+  hideCampResults.focus({preventScroll:true});
+});
 const campResultsTitle = document.getElementById("campResultsTitle");
 const campCount = document.getElementById("campCount");
 const campList = document.getElementById("campList");
@@ -2117,6 +2221,7 @@ function safeExternalUrl(value) {
 }
 
 function renderCampList(camps, label) {
+  showCampResults.hidden = true;
   campResults.hidden = false;
   campResultsTitle.textContent = `Closest campgrounds near ${label}`;
 
@@ -2193,6 +2298,7 @@ function renderCampList(camps, label) {
 async function findNearbyCamps(lat, lon, label, waitBeforeSearch = false) {
   lastCampSearch = { lat, lon, label, waitBeforeSearch };
   trackEvent("camp_search");
+  showCampResults.hidden = true;
   finderStatus.textContent = "Searching for nearby campgrounds...";
   campResults.hidden = true;
 

@@ -93,10 +93,11 @@
 
               <label>
                 End date
-                <input type="date" id="endDate" />
+                <input type="date" id="endDate" aria-describedby="tripDateStatus" />
               </label>
             </div>
 
+            <p id="tripDateStatus" class="trip-date-status" role="status" aria-live="polite">Dates include both your arrival and departure day.</p>
             <label>
               Camping style
               <select id="campType">
@@ -251,10 +252,6 @@
               </select>
             </label>
 
-            <label>
-              Quantity
-              <input type="number" id="customItemQuantity" min="0" max="99" value="0" />
-            </label>
 
             <button class="btn primary" type="submit">Add to Checklist</button>
             </form>
@@ -477,13 +474,14 @@
           </div>
         </div>
 
+        <button id="showCampResults" class="btn secondary" type="button" aria-controls="campResults" aria-expanded="false" hidden>Show campsite results</button>
         <div class="camp-results" id="campResults" hidden>
           <div class="camp-results-header">
             <div>
               <p class="eyebrow">Nearby Campsites</p>
               <h3 id="campResultsTitle">Closest campgrounds</h3>
             </div>
-            <span class="camp-count" id="campCount"></span>
+            <div class="camp-results-actions"><span class="camp-count" id="campCount"></span><button id="hideCampResults" class="btn secondary compact-btn" type="button" aria-controls="campResults" aria-expanded="true">Hide results</button></div>
           </div>
 
           <div class="camp-list" id="campList"></div>
@@ -634,6 +632,7 @@
           </div>
         </div>
         <p class="day-planner-note">Notes save automatically in this browser. Choose <strong>Save Current Trip</strong> in the checklist to keep them with your saved trip. Only people you send a Share Trip link to can see the notes in that link.</p>
+        <div class="day-planner-footer"><button class="btn primary" id="doneDayPlanner" type="button">Done</button></div>
       </div>
     </div>
 
@@ -646,6 +645,13 @@
   <button id="undoRemoveItem" type="button">Undo</button>
   <button id="dismissItemUndo" type="button" aria-label="Dismiss removal notification">×</button>
 </div>
+  <div class="modal-backdrop" id="feedbackConfirmation" hidden>
+    <div class="site-modal feedback-confirmation" role="dialog" aria-modal="true" aria-labelledby="feedbackConfirmationTitle" tabindex="-1">
+      <h2 id="feedbackConfirmationTitle">Thank you for your feedback!</h2>
+      <p>Your feedback form is complete.</p>
+      <button class="btn primary" id="closeFeedbackConfirmation" type="button">Done</button>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>

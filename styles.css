@@ -2608,3 +2608,14 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
  .checklist-toolbar {grid-template-columns:1fr;gap:14px}
  .checklist-toolbar .checklist-toolbar-actions {flex-wrap:wrap}
 }
+
+/* V44: date guidance, simpler items, and mobile-friendly closing controls. */
+.trip-date-status {grid-column:1/-1;margin:0;color:var(--muted);font-size:.875rem}
+.custom-item-form {grid-template-columns:minmax(180px,1fr) minmax(160px,.7fr) auto}
+.camp-results-actions {display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#showCampResults {margin:20px 0}
+.day-planner-footer {position:sticky;bottom:-28px;margin:20px -28px -28px;padding:14px 28px;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:flex-end;z-index:5}
+.day-planner-footer .btn {min-width:120px}
+.feedback-confirmation {max-width:440px;text-align:center}
+@media(max-width:750px){.day-planner-footer {bottom:-20px;margin:20px -20px -20px;padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom))}.custom-item-form {grid-template-columns:1fr}.camp-results-header {align-items:flex-start;flex-wrap:wrap;gap:12px}}
+@media print {.checklist-toolbar,.day-planner-footer,#showCampResults {display:none!important}}

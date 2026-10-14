@@ -56,3 +56,13 @@ Expand All, Collapse All, and Print Checklist are on the left of the search fiel
 ## Version 43
 
 Find an item is on the left; Expand All, Collapse All, and Print Checklist are on the right.
+
+## Version 44
+
+- Start/end dates and number of days synchronize immediately (both dates count).
+- End dates before the start date are disabled in the calendar and corrected if typed.
+- Daily Plans has one card per trip day; existing day notes survive regeneration and date shifts. Shortening asks before removing written notes.
+- Custom items have no quantity field; they start at quantity 1 and unchecked.
+- Nearby campsite results can be hidden and shown without another search.
+- Sticky Done button closes Daily Plans on mobile and desktop.
+- Feedback displays a confirmation popup. Written comments remain local to the visitor's browser; no central comment collection was added.
