@@ -182,6 +182,7 @@ localStorage.setItem(CURRENT_DAY_PLANS_KEY, JSON.stringify(currentDayPlans));
   } else {
     localStorage.removeItem(ACTIVE_TRIP_KEY);
   }
+  updateTripStorageStatus();
 }
 
 let currentChecklist = loadCurrentChecklist();
@@ -679,6 +680,25 @@ function dayDateLabel(startDate, offset) {
   }).format(start);
 }
 
+function dayPlanExample(index, totalDays, settings = {}) {
+  const activityIdeas = {
+    hiking: ["Walk a nearby nature trail", "Explore a different trail", "Take a short scenic hike"],
+    fishing: ["Spend time fishing", "Try a different fishing spot", "Enjoy a quiet morning by the water"],
+    swimming: ["Visit the designated swimming area", "Relax by the water", "Go for an afternoon swim"]
+  };
+  const selected = (settings.activities || []).filter(activity => activityIdeas[activity]);
+  const ideas = selected.length
+    ? selected.flatMap(activity => activityIdeas[activity])
+    : ["Explore the campground", "Take a scenic walk", "Visit a nearby viewpoint", "Enjoy an outdoor picnic"];
+  const activity = ideas[Math.max(0, index - 1) % ideas.length];
+  const setup = settings.campType === "cabin" ? "Check in and settle into the cabin" : settings.campType === "rv" ? "Arrive and set up the RV" : "Arrive and set up camp";
+  if (totalDays === 1) return {title:"A day outdoors", notes:`Morning: Arrive and explore the area\nAfternoon: ${activity}\nBefore leaving: Pack your gear and check for litter`};
+  if (index === 0) return {title:"Arrive and settle in", notes:`Arrival: ${setup}\nAfternoon: Get familiar with the campground\nEvening: ${settings.cookAtCamp ? "Prepare dinner at camp" : "Enjoy dinner"} and play a game`};
+  if (index === totalDays - 1) return {title:"Pack up and head home", notes:"Morning: Have breakfast and pack your gear\nBefore checkout: Clean the campsite and collect all litter\nDeparture: Check for forgotten items and head home"};
+  const evenings = ["Play charades with your group", "Enjoy a quiet evening and look at the stars", "Share stories and plan tomorrow", "Play a favorite camping game"];
+  return {title:`Day ${index + 1}: Explore and unwind`, notes:`Morning: ${activity}\nAfternoon: ${settings.weather === "rain" ? "Plan a sheltered activity and check the weather" : ideas[(index + 1) % ideas.length]}\nEvening: ${evenings[(index - 1) % evenings.length]}`};
+}
+
 function renderDayPlans() {
   if (!dayPlannerGrid) return;
   if (!currentPlannerSettings) {
@@ -702,6 +722,7 @@ function renderDayPlans() {
 
   dayPlannerGrid.innerHTML = currentDayPlans.map((day, i) => {
     const date = dayDateLabel(currentPlannerSettings.startDate, i);
+    const example = dayPlanExample(i, days, currentPlannerSettings);
     return `
       <article class="day-plan-card" data-day-index="${i}">
         <div class="day-plan-card-head">
@@ -710,11 +731,12 @@ function renderDayPlans() {
         </div>
         <label for="day-title-${i}">Day title
           <input id="day-title-${i}" class="day-title-input" type="text" maxlength="80"
-            placeholder="e.g. Explore the lake" value="${escapeChecklistText(day.title)}" />
+            placeholder="${escapeChecklistText(example.title)}" value="${escapeChecklistText(day.title)}" />
         </label>
+        <p class="day-example-label">Example plan below · Write your own notes</p>
         <label for="day-notes-${i}">Activities & notes
           <textarea id="day-notes-${i}" class="day-notes-input" maxlength="1200"
-            placeholder="Morning: Arrive and set up camp\nAfternoon: Walk the nature trail\nEvening: Play games at the campsite">${escapeChecklistText(day.notes)}</textarea>
+            placeholder="${escapeChecklistText(example.notes)}">${escapeChecklistText(day.notes)}</textarea>
         </label>
       </article>`;
   }).join("");
@@ -761,6 +783,14 @@ function tripDateLabel(settings) {
   return `${settings?.days || "?"} day${settings?.days === 1 ? "" : "s"}`;
 }
 
+function updateTripStorageStatus() {
+  const status = document.getElementById("tripStorageStatus");
+  if (!status) return;
+  status.textContent = currentTripId
+    ? "Saved trip · Changes save automatically on this device."
+    : "Draft saved on this device. Choose Save Current Trip to add it to Saved Trips.";
+}
+
 function updateTripSummary() {
   if (!tripSummaryCard) return;
 
@@ -787,6 +817,7 @@ function updateTripSummary() {
   `;
 
   tripSummaryCard.hidden = false;
+  updateTripStorageStatus();
 }
 
 
@@ -799,11 +830,12 @@ const checklistBody = document.getElementById("checklistBody");
 const dayPlannerModal = document.getElementById("dayPlannerModal");
 const openDayPlanner = document.getElementById("openDayPlanner");
 const closeDayPlannerModal = document.getElementById("closeDayPlannerModal");
-function togglePanel(button, body, expanded) {
+function togglePanel(button, body, expanded, remember = false) {
   if (!button || !body) return;
   button.setAttribute("aria-expanded", String(expanded));
   body.hidden = !expanded;
   if (body === checklistBody) {
+    if (remember) localStorage.setItem("camping-classics-checklist-expanded", String(expanded));
     const opener = document.getElementById("openChecklist");
     opener.hidden = expanded;
     opener.textContent = "Open Checklist";
@@ -814,14 +846,14 @@ function togglePanel(button, body, expanded) {
   }
 }
 document.getElementById("openChecklist").addEventListener("click", () => {
-  togglePanel(masterChecklistToggle, checklistBody, checklistBody.hidden);
+  togglePanel(masterChecklistToggle, checklistBody, checklistBody.hidden, true);
 });
 starterToggle?.addEventListener("click", () => {
   togglePanel(starterToggle, starterBody, starterToggle.getAttribute("aria-expanded") !== "true");
 });
 masterChecklistToggle?.addEventListener("click", () => {
   const expanded = masterChecklistToggle.getAttribute("aria-expanded") !== "true";
-  togglePanel(masterChecklistToggle, checklistBody, expanded);
+  togglePanel(masterChecklistToggle, checklistBody, expanded, true);
   trackEvent(expanded ? "checklist_master_expand" : "checklist_master_collapse");
 });
 openDayPlanner?.addEventListener("click", () => {
@@ -1058,7 +1090,7 @@ tripForm.addEventListener("submit", (event) => {
   renderDayPlans();
   updatePlannerPreview();
   togglePanel(starterToggle, starterBody, false);
-  togglePanel(masterChecklistToggle, checklistBody, true);
+  togglePanel(masterChecklistToggle, checklistBody, true, true);
 
   const displayName = tripName || "Your trip";
   plannerSummary.textContent =
@@ -1121,14 +1153,28 @@ if (collapseAllSections) {
 }
 
 
+function buildPrintChecklist() {
+  const sheet = document.getElementById("printChecklistSheet");
+  const settings = currentPlannerSettings;
+  const stats = checklistProgressStats();
+  const title = settings?.tripName?.trim() || "Camping packing checklist";
+  const details = settings ? `${tripDateLabel(settings)} · ${settings.campers} campers · ${campTypeLabel(settings.campType)}` : "Camping Classics";
+  sheet.innerHTML = `<header class="print-heading"><p>Camping Classics</p><h1>${escapeChecklistText(title)}</h1><p>${escapeChecklistText(details)}</p><p>${stats.checked} of ${stats.total} items packed · Quantities show how many you plan to bring.</p></header>` +
+    Object.entries(currentChecklist).map(([category, items]) => `<table class="print-category"><caption>${escapeChecklistText(category)}</caption><thead><tr><th class="print-packed-col">Packed</th><th>Item</th><th class="print-qty-col">Qty</th></tr></thead><tbody>${items.map(item => `<tr><td><span class="print-box">${item.checked && item.quantity > 0 ? "✓" : ""}</span></td><td>${escapeChecklistText(item.label)}</td><td>${clampQuantity(item.quantity)}</td></tr>`).join("")}</tbody></table>`).join("") +
+    `<p class="print-footnote">Check items off as you pack. Generated from your current trip.</p>`;
+}
+window.addEventListener("beforeprint", buildPrintChecklist);
+
 if (printChecklist) {
   printChecklist.addEventListener("click", () => {
     trackEvent("print_checklist");
+    buildPrintChecklist();
     window.print();
   });
 }
 
 resetChecklist.addEventListener("click", () => {
+  if (!window.confirm("Reset the checklist to default items and clear packing progress? Custom items will be removed. Your trip details and daily notes will stay.")) return;
   currentChecklist = cloneData(defaultChecklist);
   renderChecklist();
   updateTripSummary();
@@ -1377,6 +1423,7 @@ function checkForSharedTripLink() {
 
 
 function renderSavedTrips() {
+  updateTripStorageStatus();
   const trips = loadSavedTrips().sort((a, b) => b.updatedAt - a.updatedAt);
 
   if (trips.length === 0) {
@@ -1875,7 +1922,7 @@ updatePlannerPreview();
 updateTripSummary();
 renderSavedTrips();
 attachStaticCollapsibleControls();
-togglePanel(masterChecklistToggle, checklistBody, Boolean(currentPlannerSettings));
+togglePanel(masterChecklistToggle, checklistBody, Boolean(currentPlannerSettings) && localStorage.getItem("camping-classics-checklist-expanded") !== "false");
 checkForSharedTripLink();
 
 const useLocationBtn = document.getElementById("useLocationBtn");
@@ -2536,31 +2583,71 @@ window.addEventListener("online", updateOfflineStatus);
 window.addEventListener("offline", updateOfflineStatus);
 updateOfflineStatus();
 
+let siteUpdateRegistration = null;
+let siteUpdateRefreshRequested = false;
+let siteUpdateLastCheck = 0;
+function offerSiteUpdate(registration) {
+  if (!registration.waiting || !navigator.serviceWorker.controller) return;
+  siteUpdateRegistration = registration;
+  document.getElementById("siteUpdatePrompt").hidden = false;
+}
+document.getElementById("dismissSiteUpdate").addEventListener("click", () => {
+  document.getElementById("siteUpdatePrompt").hidden = true;
+});
+document.getElementById("refreshSiteUpdate").addEventListener("click", () => {
+  try { saveCurrentState(); } catch (_) {
+    document.getElementById("siteUpdateMessage").textContent = "Could not save this trip. Download a trip backup before refreshing.";
+    return;
+  }
+  if (siteUpdateRegistration?.waiting) {
+    siteUpdateRefreshRequested = true;
+    document.getElementById("refreshSiteUpdate").disabled = true;
+    siteUpdateRegistration.waiting.postMessage({type:"SKIP_WAITING"});
+  } else window.location.reload();
+});
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {
-      // The site still works normally if service-worker registration fails.
-    });
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (siteUpdateRefreshRequested) window.location.reload();
+  });
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("./sw.js", {updateViaCache:"none"});
+      siteUpdateRegistration = registration;
+      offerSiteUpdate(registration);
+      registration.addEventListener("updatefound", () => {
+        const worker = registration.installing;
+        worker?.addEventListener("statechange", () => {
+          if (worker.state === "installed") offerSiteUpdate(registration);
+        });
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && navigator.onLine && Date.now() - siteUpdateLastCheck > 60000) {
+          siteUpdateLastCheck = Date.now();
+          registration.update().catch(() => {});
+        }
+      });
+      registration.update().catch(() => {});
+    } catch (_) { /* Core planning works when offline support is unavailable. */ }
   });
 }
-
 
 // Search keeps categories and item controls intact.
 const packingSearch = document.getElementById("packingSearch");
 function filterPackingItems() {
   const query = (packingSearch?.value || "").trim().toLowerCase();
+  let totalMatches = 0;
   document.querySelectorAll("#checklistGrid .check-card").forEach(card => {
     let matches = 0;
     card.querySelectorAll(".check-item").forEach(row => {
       row.hidden = !row.querySelector(".check-main span").textContent.toLowerCase().includes(query);
       if (!row.hidden) matches++;
     });
+    totalMatches += matches;
     card.hidden = matches === 0;
-    if (query && matches) {
-      const toggle = card.querySelector(".collapsible-toggle");
-      if (toggle?.getAttribute("aria-expanded") === "false") toggle.click();
-    }
+    if (query && matches) setSectionExpanded(card.dataset.collapsible, true, false);
   });
+  if (!query) applyCollapsedState(checklistGrid);
+  document.getElementById("packingSearchEmpty").hidden = !query || totalMatches > 0;
 }
 packingSearch?.addEventListener("input", filterPackingItems);
 new MutationObserver(filterPackingItems).observe(checklistGrid, {childList:true});
@@ -2581,3 +2668,118 @@ if (document.modelContext?.registerTool) {
     window.addEventListener("pagehide", () => lifecycle.abort(), {once:true});
   } catch (_) {}
 }
+
+// Portable backups contain user trip data only; restores append new saved trips.
+function createTripBackup() {
+  const trips = cloneData(loadSavedTrips());
+  if (currentPlannerSettings && !currentTripId) {
+    trips.push({
+      name: currentPlannerSettings.tripName?.trim() || "Current trip draft",
+      planner: cloneData(currentPlannerSettings),
+      checklist: cloneData(currentChecklist),
+      dayPlans: normalizeDayPlans(currentDayPlans, currentPlannerSettings.days),
+      archived: false
+    });
+  }
+  return {app:"Camping Classics", formatVersion:1, exportedAt:new Date().toISOString(), trips};
+}
+
+function validateTripBackup(payload) {
+  if (!payload || payload.app !== "Camping Classics" || payload.formatVersion !== 1 ||
+      !Array.isArray(payload.trips) || payload.trips.length > 200) {
+    throw new Error("Choose a Camping Classics trip backup (up to 200 trips).");
+  }
+  const isRecord = value => value && typeof value === "object" && !Array.isArray(value);
+  return payload.trips.map(raw => {
+    if (!isRecord(raw) || typeof raw.name !== "string" || !raw.name.trim() || raw.name.length > 120 ||
+        !isRecord(raw.planner) || !isRecord(raw.checklist)) throw new Error("The backup contains an invalid trip.");
+    const src = raw.planner;
+    const days = Number(src.days);
+    const campers = Number(src.campers);
+    if (!Number.isInteger(days) || days < 1 || days > 30 ||
+        !Number.isInteger(campers) || campers < 1 || campers > 20) throw new Error("The backup contains an invalid trip length or camper count.");
+    const validDate = value => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+      parseDateOnly(value)?.toISOString().slice(0,10) === value;
+    let startDate = src.startDate || "", endDate = src.endDate || "";
+    if ((startDate && !validDate(startDate)) || (endDate && !validDate(endDate))) throw new Error("The backup contains an invalid trip date.");
+    if (startDate) endDate = datePlusDays(startDate, days - 1);
+    else if (endDate) startDate = datePlusDays(endDate, 1 - days);
+    const checklist = {};
+    let itemCount = 0;
+    const entries = Object.entries(raw.checklist);
+    if (entries.length > 30) throw new Error("The backup contains too many categories.");
+    entries.forEach(([category, items]) => {
+      if (!category.trim() || category.length > 80 || ["__proto__","constructor","prototype"].includes(category) || !Array.isArray(items)) {
+        throw new Error("The backup contains an invalid checklist category.");
+      }
+      itemCount += items.length;
+      if (itemCount > 1000) throw new Error("A trip in this backup has too many items.");
+      checklist[category] = items.map(item => {
+        if (!isRecord(item) || typeof item.label !== "string" || !item.label.trim() || item.label.length > 160 ||
+            !Number.isInteger(item.quantity) || item.quantity < 0 || item.quantity > 99 || typeof item.checked !== "boolean") {
+          throw new Error("The backup contains an invalid checklist item.");
+        }
+        return createChecklistItem(item.label, item.quantity, item.checked, Boolean(item.custom));
+      });
+    });
+    if (raw.dayPlans != null && (!Array.isArray(raw.dayPlans) || raw.dayPlans.length > 30 || raw.dayPlans.some(day =>
+      !isRecord(day) || (day.title != null && (typeof day.title !== "string" || day.title.length > 80)) ||
+      (day.notes != null && (typeof day.notes !== "string" || day.notes.length > 1200))))) {
+      throw new Error("The backup contains invalid daily notes.");
+    }
+    return {
+      name: raw.name.trim(),
+      planner: {tripName:raw.name.trim(),days,campers,startDate,endDate,
+        campType:["tent","cabin","rv"].includes(src.campType) ? src.campType : "tent",
+        weather:["mild","hot","cold","rain"].includes(src.weather) ? src.weather : "mild",
+        activities:Array.isArray(src.activities) ? src.activities.filter(x => ["hiking","fishing","swimming"].includes(x)) : [],
+        withKids:Boolean(src.withKids),withPet:Boolean(src.withPet),cookAtCamp:Boolean(src.cookAtCamp),noWater:Boolean(src.noWater)},
+      checklist, dayPlans:normalizeDayPlans(raw.dayPlans,days), archived:Boolean(raw.archived)
+    };
+  });
+}
+
+function restoreTripBackupData(payload) {
+  const incoming = validateTripBackup(payload);
+  const existing = loadSavedTrips();
+  const now = Date.now();
+  const copies = incoming.map((trip, i) => ({...trip,
+    id:`trip-restored-${now}-${i}-${crypto.randomUUID()}`, createdAt:now, updatedAt:now}));
+  if (copies.length) writeSavedTrips([...existing,...copies]);
+  renderSavedTrips();
+  return copies.length;
+}
+
+document.getElementById("exportTripBackup").addEventListener("click", () => {
+  const status = document.getElementById("tripBackupStatus");
+  const backup = createTripBackup();
+  if (!backup.trips.length) { status.textContent = "Create or save a trip before downloading a backup."; return; }
+  const url = URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:"application/json"}));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `camping-classics-trips-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url),10000);
+  status.textContent = `Backup download started for ${backup.trips.length} trip${backup.trips.length === 1 ? "" : "s"}. Keep the file to restore your plans later.`;
+});
+document.getElementById("restoreTripBackup").addEventListener("click", () => document.getElementById("tripBackupFile").click());
+document.getElementById("tripBackupFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const status = document.getElementById("tripBackupStatus");
+  try {
+    if (file.size > 2 * 1024 * 1024) throw new Error("Choose a backup smaller than 2 MB.");
+    const payload = JSON.parse(await file.text());
+    const trips = validateTripBackup(payload);
+    if (!trips.length) {status.textContent = "This backup has no trips to restore.";return;}
+    if (!window.confirm(`Add ${trips.length} trip${trips.length === 1 ? "" : "s"} from this backup to Saved Trips? Your current trip and existing saved trips will stay as they are.`)) return;
+    const count = restoreTripBackupData(payload);
+    status.textContent = `${count} trip${count === 1 ? "" : "s"} restored to Saved Trips. Existing trips were kept.`;
+  } catch (error) {
+    status.textContent = error instanceof SyntaxError ? "This file is not valid JSON. Choose a Camping Classics backup." :
+      error.name === "QuotaExceededError" ? "There is not enough browser storage to restore these trips. Your existing trips were kept." :
+      error.message || "Could not restore this backup. Your existing trips were kept.";
+  } finally {event.target.value = "";}
+});

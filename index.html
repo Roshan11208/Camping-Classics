@@ -158,6 +158,7 @@
           <div>
             <p class="eyebrow">Current Trip</p>
             <h3 id="tripSummaryName">Camping Trip</h3>
+            <p id="tripStorageStatus" class="trip-storage-status" role="status"></p>
           </div>
           <div class="trip-summary-details" id="tripSummaryDetails"></div>
           <div class="trip-summary-actions">
@@ -211,6 +212,7 @@
           </div>
         </div>
 
+        <p id="packingSearchEmpty" class="packing-search-empty" role="status" hidden>No items found. Try another search or clear the search field.</p>
         <div class="checklist-grid" id="checklistGrid"></div>
 
         <div class="custom-item-card collapsible-card" data-collapsible="custom-items">
@@ -276,7 +278,13 @@
           <p>Save, share, duplicate, and revisit your camping plans. Completed trips can be archived so your upcoming trips stay organized.</p>
         </div>
 
-        <p class="device-note">Saved on this browser and device. Use Share Trip to take a plan with you.</p><div class="saved-trips-grid" id="savedTripsList"></div>
+        <p class="device-note">Saved on this browser and device. Back up your trips to keep a separate copy.</p>
+        <div class="trip-backup-actions">
+          <button class="btn secondary" id="exportTripBackup" type="button">Download trip backup</button>
+          <button class="btn secondary" id="restoreTripBackup" type="button">Restore from backup</button>
+          <input id="tripBackupFile" type="file" accept=".json,application/json" hidden />
+        </div>
+        <p id="tripBackupStatus" class="device-note" role="status" aria-live="polite"></p><div class="saved-trips-grid" id="savedTripsList"></div>
       </div>
     </section>
 
@@ -652,6 +660,11 @@
       <button class="btn primary" id="closeFeedbackConfirmation" type="button">Done</button>
     </div>
   </div>
+  <aside id="siteUpdatePrompt" class="site-update-prompt" role="status" aria-live="polite" hidden>
+    <div><strong>New version available</strong><p id="siteUpdateMessage">Refresh to get the latest improvements.</p></div>
+    <div class="site-update-actions"><button class="btn primary" id="refreshSiteUpdate" type="button">Refresh</button><button class="btn secondary" id="dismissSiteUpdate" type="button">Later</button></div>
+  </aside>
+  <section id="printChecklistSheet" aria-hidden="true"></section>
   <script src="script.js"></script>
 </body>
 </html>

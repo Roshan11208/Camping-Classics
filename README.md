@@ -66,3 +66,25 @@ Find an item is on the left; Expand All, Collapse All, and Print Checklist are o
 - Nearby campsite results can be hidden and shown without another search.
 - Sticky Done button closes Daily Plans on mobile and desktop.
 - Feedback displays a confirmation popup. Written comments remain local to the visitor's browser; no central comment collection was added.
+
+## Version 45 — usability and trip backups
+
+- Sidebar icons align with the logo in the collapsed rail.
+- Daily Plans uses different arrival, activity, departure, and one-day examples, tailored to selected activities. Examples are placeholders, never saved as your notes.
+- Print Checklist builds a clean document with trip details, packing boxes, item names, and quantities. It includes the complete list regardless of search or collapse state.
+- Phone toolbar buttons fit in one balanced row below search; quantity controls keep their existing size.
+- Reset Checklist asks before removing custom items and clearing packing progress.
+- Category collapse preferences are preserved; the main checklist arrow remembers your choice for an existing trip. Generating a new list still opens it.
+- Search shows No items found when appropriate. Searching temporarily opens matching categories without overwriting collapse preferences.
+- Current-trip status distinguishes a device-saved draft from a trip added to Saved Trips.
+- Download trip backup exports saved trips and the current draft to JSON. Restore from backup validates the complete file and adds new copies to Saved Trips; existing trips and the current draft are preserved. Maximum import: 2 MB and 200 trips.
+- Custom items start at quantity 0 and unchecked.
+- New-version prompt offers Refresh or Later. Refresh saves current state before activating the waiting update. This workflow applies once this version is installed; browsers still running older code may need a manual refresh first.
+
+### Future file updates
+
+Change CACHE_NAME in sw.js for each release (for example camping-classics-v46), and upload sw.js together with the changed HTML, CSS, and JavaScript. The update prompt detects a newly installed waiting service worker. Upload the six files to your repository root; no build is required.
+
+### Verification
+
+JavaScript syntax, print-output content, example generation, reset cancellation, trip backup validation and restoration, search behavior, and update activation logic were checked. Browser visual and physical print testing were unavailable in the authoring environment.
