@@ -196,11 +196,12 @@ function getAllChecklistItems() {
 }
 
 function updatePlannerPreview() {
-  const items = getAllChecklistItems();
-
+  const settings = collectPlannerSettings();
+  const items = Object.values(buildPackingSuggestions(settings)).flat();
   plannerList.innerHTML = items
-    .map((item) => `<li>${escapeChecklistText(item.label)} <strong>×${item.quantity}</strong></li>`)
+    .map(item => `<li>${escapeChecklistText(item.label)} <strong>×${item.quantity}</strong></li>`)
     .join("");
+  plannerSummary.textContent = `Suggestions for ${settings.campers} camper${settings.campers === 1 ? "" : "s"} over ${settings.days} day${settings.days === 1 ? "" : "s"}. Generate your list when ready.`;
 }
 
 function checklistProgressStats(checklist = currentChecklist) {
@@ -560,18 +561,114 @@ document.getElementById("dismissItemUndo").addEventListener("click", () => {
   document.getElementById("masterChecklistToggle").focus({preventScroll:true});
 });
 
-function plannerItem(label, quantity = 0) {
-  return createChecklistItem(label, 0);
+function addSuggestedItem(checklist, category, label, quantity) {
+  if (!checklist[category]) checklist[category] = [];
+  const amount = Math.max(0, Math.trunc(Number(quantity) || 0));
+  const existing = checklist[category].find(item => item.label === label);
+  if (existing) existing.quantity = Math.max(existing.quantity, amount);
+  else checklist[category].push({label, quantity:amount});
 }
 
-function addPlannerItem(checklist, category, label, quantity = 0) {
-  if (!checklist[category]) checklist[category] = [];
+function buildPackingSuggestions(settings) {
+  const {campers, days, campType, weather, activities, withKids, withPet, cookAtCamp, noWater} = settings;
+  const generated = {
+    "Shelter & Sleep": [],
+    "Food & Water": [],
+    "Clothing": [],
+    "Safety & Essentials": []
+  };
 
-  const existing = checklist[category].find((item) => item.label === label);
-
-  if (!existing) {
-    checklist[category].push(plannerItem(label, 0));
+  if (campType === "tent") {
+    addSuggestedItem(generated, "Shelter & Sleep", "Tent with stakes", Math.max(1, Math.ceil(campers / 4)));
+    addSuggestedItem(generated, "Shelter & Sleep", "Sleeping bag", campers);
+    addSuggestedItem(generated, "Shelter & Sleep", "Sleeping pad", campers);
+    addSuggestedItem(generated, "Shelter & Sleep", "Pillow", campers);
+  } else if (campType === "cabin") {
+    addSuggestedItem(generated, "Shelter & Sleep", "Bedding or sleeping bag", campers);
+    addSuggestedItem(generated, "Shelter & Sleep", "Pillow", campers);
+    addSuggestedItem(generated, "Shelter & Sleep", "Indoor shoes or slippers", campers);
+  } else {
+    addSuggestedItem(generated, "Shelter & Sleep", "RV hookup supplies", 1);
+    addSuggestedItem(generated, "Shelter & Sleep", "Bedding", campers);
+    addSuggestedItem(generated, "Shelter & Sleep", "Pillow", campers);
   }
+
+  addSuggestedItem(generated, "Food & Water", "Meals", campers * days * 3);
+  addSuggestedItem(generated, "Food & Water", "Snack servings", campers * days * 2);
+  addSuggestedItem(generated, "Food & Water", "Drinking water servings", campers * days * 2);
+  addSuggestedItem(generated, "Food & Water", "Cooler", Math.max(1, Math.ceil(campers / 4)));
+  addSuggestedItem(generated, "Food & Water", "Plates and utensil sets", campers);
+
+  addSuggestedItem(generated, "Clothing", "Comfortable shoe pairs", campers);
+  addSuggestedItem(generated, "Clothing", "Extra sock pairs", campers * Math.max(1, days));
+
+  addSuggestedItem(generated, "Safety & Essentials", "Flashlight or headlamp", campers);
+  addSuggestedItem(generated, "Safety & Essentials", "First-aid kit", 1);
+  addSuggestedItem(generated, "Safety & Essentials", "Trash bags", Math.max(2, days));
+  addSuggestedItem(generated, "Safety & Essentials", "Phone charger or power bank", Math.max(1, Math.ceil(campers / 2)));
+
+  if (weather === "rain") {
+    addSuggestedItem(generated, "Clothing", "Rain jacket", campers);
+    addSuggestedItem(generated, "Clothing", "Extra sock pairs", campers * Math.max(2, days));
+    addSuggestedItem(generated, "Safety & Essentials", "Waterproof bag for clothes", Math.max(1, campers));
+    addSuggestedItem(generated, "Shelter & Sleep", "Extra tarp", 1);
+  } else if (weather === "cold") {
+    addSuggestedItem(generated, "Clothing", "Warm layers", campers);
+    addSuggestedItem(generated, "Clothing", "Hat and glove sets", campers);
+    addSuggestedItem(generated, "Shelter & Sleep", "Extra blanket", campers);
+  } else if (weather === "hot") {
+    addSuggestedItem(generated, "Clothing", "Lightweight clothing sets", campers);
+    addSuggestedItem(generated, "Clothing", "Sun hat", campers);
+    addSuggestedItem(generated, "Food & Water", "Extra drinking water servings", campers * days);
+  } else {
+    addSuggestedItem(generated, "Clothing", "Light jacket", campers);
+  }
+
+  if (activities.includes("hiking")) {
+    addSuggestedItem(generated, "Activities", "Daypack", campers);
+    addSuggestedItem(generated, "Activities", "Trail map or offline map", 1);
+    addSuggestedItem(generated, "Activities", "Hiking water bottle", campers);
+  }
+
+  if (activities.includes("fishing")) {
+    addSuggestedItem(generated, "Activities", "Fishing gear set", 1);
+    addSuggestedItem(generated, "Activities", "Tackle box", 1);
+  }
+
+  if (activities.includes("swimming")) {
+    addSuggestedItem(generated, "Activities", "Swimsuit", campers);
+    addSuggestedItem(generated, "Activities", "Towel", campers);
+    addSuggestedItem(generated, "Activities", "Water shoes", campers);
+  }
+
+  if (withKids) {
+    addSuggestedItem(generated, "Extras", "Kid activities or games", 1);
+    addSuggestedItem(generated, "Extras", "Extra kid clothing sets", 2);
+  }
+
+  if (withPet) {
+    addSuggestedItem(generated, "Food & Water", "Pet food servings", days * 2);
+    addSuggestedItem(generated, "Food & Water", "Pet water servings", days * 2);
+    addSuggestedItem(generated, "Extras", "Pet leash", 1);
+    addSuggestedItem(generated, "Extras", "Pet waste bags", Math.max(2, days * 2));
+  }
+
+  if (cookAtCamp) {
+    addSuggestedItem(generated, "Food & Water", "Camp stove or approved cooking setup", 1);
+    addSuggestedItem(generated, "Food & Water", "Cooking utensil set", 1);
+    addSuggestedItem(generated, "Food & Water", "Food storage containers", Math.max(1, days));
+  }
+
+  if (noWater) {
+    addSuggestedItem(generated, "Food & Water", "Extra water supply servings", campers * days * 2);
+  }
+
+  return generated;
+}
+
+function buildStartingChecklist(settings) {
+  return Object.fromEntries(Object.entries(buildPackingSuggestions(settings)).map(([category, items]) =>
+    [category, items.map(item => createChecklistItem(item.label, 0, false, false))]));
 }
 
 function collectPlannerSettings() {
@@ -943,6 +1040,9 @@ function syncPlannerDates(changedField, updateCurrent = true) {
   input.addEventListener("change", () => syncPlannerDates(input.id));
 });
 
+tripForm.addEventListener("input", updatePlannerPreview);
+tripForm.addEventListener("change", updatePlannerPreview);
+
 tripForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -979,99 +1079,7 @@ tripForm.addEventListener("submit", (event) => {
     noWater
   } = currentPlannerSettings;
 
-  const generated = {
-    "Shelter & Sleep": [],
-    "Food & Water": [],
-    "Clothing": [],
-    "Safety & Essentials": []
-  };
-
-  if (campType === "tent") {
-    addPlannerItem(generated, "Shelter & Sleep", "Tent with stakes", Math.max(1, Math.ceil(campers / 4)));
-    addPlannerItem(generated, "Shelter & Sleep", "Sleeping bag", campers);
-    addPlannerItem(generated, "Shelter & Sleep", "Sleeping pad", campers);
-    addPlannerItem(generated, "Shelter & Sleep", "Pillow", campers);
-  } else if (campType === "cabin") {
-    addPlannerItem(generated, "Shelter & Sleep", "Bedding or sleeping bag", campers);
-    addPlannerItem(generated, "Shelter & Sleep", "Pillow", campers);
-    addPlannerItem(generated, "Shelter & Sleep", "Indoor shoes or slippers", campers);
-  } else {
-    addPlannerItem(generated, "Shelter & Sleep", "RV hookup supplies", 1);
-    addPlannerItem(generated, "Shelter & Sleep", "Bedding", campers);
-    addPlannerItem(generated, "Shelter & Sleep", "Pillow", campers);
-  }
-
-  addPlannerItem(generated, "Food & Water", "Meals", campers * days * 3);
-  addPlannerItem(generated, "Food & Water", "Snack servings", campers * days * 2);
-  addPlannerItem(generated, "Food & Water", "Drinking water servings", campers * days * 2);
-  addPlannerItem(generated, "Food & Water", "Cooler", Math.max(1, Math.ceil(campers / 4)));
-  addPlannerItem(generated, "Food & Water", "Plates and utensil sets", campers);
-
-  addPlannerItem(generated, "Clothing", "Comfortable shoe pairs", campers);
-  addPlannerItem(generated, "Clothing", "Extra sock pairs", campers * Math.max(1, days));
-
-  addPlannerItem(generated, "Safety & Essentials", "Flashlight or headlamp", campers);
-  addPlannerItem(generated, "Safety & Essentials", "First-aid kit", 1);
-  addPlannerItem(generated, "Safety & Essentials", "Trash bags", Math.max(2, days));
-  addPlannerItem(generated, "Safety & Essentials", "Phone charger or power bank", Math.max(1, Math.ceil(campers / 2)));
-
-  if (weather === "rain") {
-    addPlannerItem(generated, "Clothing", "Rain jacket", campers);
-    addPlannerItem(generated, "Clothing", "Extra sock pairs", campers * Math.max(2, days));
-    addPlannerItem(generated, "Safety & Essentials", "Waterproof bag for clothes", Math.max(1, campers));
-    addPlannerItem(generated, "Shelter & Sleep", "Extra tarp", 1);
-  } else if (weather === "cold") {
-    addPlannerItem(generated, "Clothing", "Warm layers", campers);
-    addPlannerItem(generated, "Clothing", "Hat and glove sets", campers);
-    addPlannerItem(generated, "Shelter & Sleep", "Extra blanket", campers);
-  } else if (weather === "hot") {
-    addPlannerItem(generated, "Clothing", "Lightweight clothing sets", campers);
-    addPlannerItem(generated, "Clothing", "Sun hat", campers);
-    addPlannerItem(generated, "Food & Water", "Extra drinking water servings", campers * days);
-  } else {
-    addPlannerItem(generated, "Clothing", "Light jacket", campers);
-  }
-
-  if (activities.includes("hiking")) {
-    addPlannerItem(generated, "Activities", "Daypack", campers);
-    addPlannerItem(generated, "Activities", "Trail map or offline map", 1);
-    addPlannerItem(generated, "Activities", "Hiking water bottle", campers);
-  }
-
-  if (activities.includes("fishing")) {
-    addPlannerItem(generated, "Activities", "Fishing gear set", 1);
-    addPlannerItem(generated, "Activities", "Tackle box", 1);
-  }
-
-  if (activities.includes("swimming")) {
-    addPlannerItem(generated, "Activities", "Swimsuit", campers);
-    addPlannerItem(generated, "Activities", "Towel", campers);
-    addPlannerItem(generated, "Activities", "Water shoes", campers);
-  }
-
-  if (withKids) {
-    addPlannerItem(generated, "Extras", "Kid activities or games", 1);
-    addPlannerItem(generated, "Extras", "Extra kid clothing sets", 2);
-  }
-
-  if (withPet) {
-    addPlannerItem(generated, "Food & Water", "Pet food servings", days * 2);
-    addPlannerItem(generated, "Food & Water", "Pet water servings", days * 2);
-    addPlannerItem(generated, "Extras", "Pet leash", 1);
-    addPlannerItem(generated, "Extras", "Pet waste bags", Math.max(2, days * 2));
-  }
-
-  if (cookAtCamp) {
-    addPlannerItem(generated, "Food & Water", "Camp stove or approved cooking setup", 1);
-    addPlannerItem(generated, "Food & Water", "Cooking utensil set", 1);
-    addPlannerItem(generated, "Food & Water", "Food storage containers", Math.max(1, days));
-  }
-
-  if (noWater) {
-    addPlannerItem(generated, "Food & Water", "Extra water supply servings", campers * days * 2);
-  }
-
-  currentChecklist = normalizeChecklist(generated);
+  currentChecklist = buildStartingChecklist(currentPlannerSettings);
   currentDayPlans = normalizeDayPlans(currentDayPlans, currentPlannerSettings.days);
 
   trackEvent("generate_packing_list", {

@@ -11,8 +11,8 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Camping Classics | Free Camping Planner & Packing Checklist</title>
-<meta name="description" content="Plan camping trips with free personalized packing checklists, daily itineraries, meal planning, campground discovery, and fun camping games." />
+  <title>Camping Classics</title>
+  <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
   <link rel="stylesheet" href="styles.css" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
@@ -136,9 +136,9 @@
           </form>
 
           <div class="planner-result">
-            <h3>Your suggested items</h3>
-            <p id="plannerSummary">Fill out the planner and generate your list.</p>
-            <ul id="plannerList" class="result-list"></ul>
+            <h3 id="suggestedItemsHeading">Your suggested items</h3>
+            <p id="plannerSummary" aria-live="polite" aria-atomic="true">Choose your trip details to see suggested items.</p>
+            <ul id="plannerList" class="result-list" aria-labelledby="suggestedItemsHeading"></ul>
           </div>
         </div>
           </div>
@@ -508,6 +508,21 @@
           <h2>Make your next camping trip easier to prepare for.</h2>
         </div>
         <a class="btn light" href="#planner">Start Planning</a>
+      </div>
+    </section>
+
+    <section class="section camping-overview" id="camping-overview" aria-labelledby="campingOverviewHeading">
+      <div class="container">
+        <div class="camping-overview-card">
+          <h2 id="campingOverviewHeading">Free Camping Trip Planner &amp; Packing Checklist</h2>
+          <p class="camping-overview-description">Planning your next camping trip? Camping Classics helps beginners, families, and outdoor enthusiasts organize their adventures in one place. Create personalized packing checklists, organize daily activities, plan meals, discover nearby campgrounds, and explore fun camping games.</p>
+          <ul class="camping-overview-features">
+            <li><h3>Personalized Packing Checklists</h3><p>Generate packing lists based on trip details.</p></li>
+            <li><h3>Daily Trip Planning</h3><p>Organize activities and notes for each day.</p></li>
+            <li><h3>Campground Finder</h3><p>Discover camping locations near you.</p></li>
+            <li><h3>Camping Games</h3><p>Explore games and activities for friends and family.</p></li>
+          </ul>
+        </div>
       </div>
     </section>
   </main>

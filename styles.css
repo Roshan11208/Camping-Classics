@@ -2667,3 +2667,14 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
  .print-box {display:inline-block;width:11pt;height:11pt;border:1pt solid #333;line-height:11pt;text-align:center;font-size:10pt}
  .print-footnote {font-size:9pt;color:#444;margin-top:10pt}
 }
+
+/* V46: compact, visible homepage overview in the existing card style. */
+.camping-overview {padding-top:30px;padding-bottom:30px}
+.camping-overview-card {padding:26px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.camping-overview-card h2 {font-size:clamp(1.45rem,2.5vw,1.8rem);margin:0 0 12px;line-height:1.25}
+.camping-overview-description {margin:0;color:var(--muted);line-height:1.6}
+.camping-overview-features {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;list-style:none;padding:20px 0 0;margin:20px 0 0;border-top:1px solid var(--border)}
+.camping-overview-features h3 {font-size:1rem;line-height:1.35;margin:0 0 7px}
+.camping-overview-features p {font-size:.9rem;color:var(--muted);line-height:1.5;margin:0}
+@media(max-width:1000px){.camping-overview-features {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.camping-overview-card {padding:20px}.camping-overview-features {grid-template-columns:1fr;gap:16px}.camping-overview {padding-top:24px;padding-bottom:24px}}
