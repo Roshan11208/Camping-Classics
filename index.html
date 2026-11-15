@@ -85,18 +85,15 @@
               <input type="number" id="days" min="1" max="30" value="2" />
             </label>
 
-            <div class="planner-date-grid">
-              <label>
-                Start date
-                <input type="date" id="startDate" />
-              </label>
-
-              <label>
-                End date
-                <input type="date" id="endDate" aria-describedby="tripDateStatus" />
-              </label>
+            <div class="range-picker" id="rangePicker">
+              <input type="hidden" id="startDate"><input type="hidden" id="endDate">
+              <div class="range-fields"><button type="button" id="pickStart" aria-controls="rangeCalendar" aria-expanded="false">Start date<strong>Choose date</strong></button><button type="button" id="pickEnd" aria-controls="rangeCalendar" aria-expanded="false">End date<strong>Choose date</strong></button></div>
+              <div id="rangeCalendar" hidden>
+                <div class="range-nav"><button type="button" id="prevMonth" aria-label="Previous month">‹</button><strong id="rangeMonth"></strong><button type="button" id="nextMonth" aria-label="Next month">›</button></div>
+                <p id="rangeHint" aria-live="polite"></p><div id="rangeDays"></div>
+                <button type="button" class="btn secondary compact-btn" id="cancelDates">Cancel</button> <button type="button" class="btn secondary compact-btn" id="clearDates">Clear dates</button>
+              </div>
             </div>
-
             <p id="tripDateStatus" class="trip-date-status" role="status" aria-live="polite">Dates include both your arrival and departure day.</p>
             <label>
               Camping style
@@ -174,11 +171,13 @@
           <div class="checklist-toolbar-actions">
             <button class="btn secondary compact-btn" id="expandAllSections" type="button">Expand All</button>
             <button class="btn secondary compact-btn" id="collapseAllSections" type="button">Collapse All</button>
+            <button class="btn secondary compact-btn" type="button" id="autoPack" title="Mark suggested checklist items as packed">Auto-fill as packed</button>
             <button class="btn secondary compact-btn" id="printChecklist" type="button">Print Checklist</button>
           </div>
         </div>
 
-        <div class="excel-tools" role="group" aria-label="Excel checklist tools">
+        <p id="autoPackStatus" role="status" class="device-note"></p>
+          <div class="excel-tools" role="group" aria-label="Excel checklist tools">
           <span>Excel checklist</span>
           <button class="btn secondary compact-btn" id="exportChecklistExcel" type="button">Export to Excel</button>
           <button class="btn secondary compact-btn" id="importChecklistExcel" type="button">Import spreadsheet</button>
@@ -457,7 +456,7 @@
               <button class="btn primary" type="button" id="useLocationBtn">Use My Location</button>
               <span class="finder-or">or</span>
 
-              <form id="campSearchForm" class="camp-search-form">
+              <form id="campSearchForm" action="#camp-finder" class="camp-search-form">
                 <label class="sr-only" for="campSearchInput">City or ZIP code</label>
                 <input
                   type="text"

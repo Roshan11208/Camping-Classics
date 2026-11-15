@@ -2706,3 +2706,28 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
 .excel-import-actions .btn:disabled {opacity:.5;cursor:not-allowed}
 @media(max-width:600px){.excel-tools>span {width:100%}.excel-tools>.btn {flex:1;min-width:130px}.excel-import-modal {padding:20px}.excel-import-actions .btn {flex:1;min-width:115px}.excel-preview {min-width:440px}}
 @media print{.excel-tools,#excelStatus,#excelImportModal {display:none!important}}
+
+/* Trip range and checklist interactions */
+.range-picker {grid-column:1/-1;min-width:0}
+.range-fields {display:grid;grid-template-columns:1fr 1fr;border:1px solid #bccdc1;border-radius:12px;overflow:hidden;background:white}
+.range-fields button {background:transparent;border:0;text-align:left;padding:11px 14px;color:#52695c;font:inherit;font-size:.82rem;cursor:pointer}
+.range-fields button + button {border-left:1px solid #cedbd2}
+.range-fields button[aria-expanded=true],.range-fields button:hover {background:#eff6ef}
+.range-fields strong {display:block;color:#193c2c;font-size:1rem;margin-top:3px}
+#rangeCalendar {max-width:380px;margin-top:8px;padding:14px;border:1px solid #cedbd2;border-radius:12px;background:white}
+.range-nav {display:flex;align-items:center;justify-content:space-between}
+.range-nav button,#rangeDays button {border:0;background:#f5f8f5;color:#214d37;cursor:pointer;font:inherit;padding:6px;border-radius:6px}
+.range-nav button {width:36px;font-size:1.25rem}
+#rangeHint {font-size:.84rem;margin:7px 0}
+#rangeDays {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px 0;text-align:center;margin:10px 0}
+#rangeDays small {color:#546459}
+#rangeDays button {background:white;min-height:34px}
+#rangeDays button:disabled {color:#a6ada7;cursor:default}
+#rangeDays .in-range {background:#d7ebdf;border-radius:0}
+#rangeDays .range-edge {background:#215d43;color:white;font-weight:bold}
+#rangeDays button:hover:not(:disabled),.range-fields button:focus-visible {outline:2px solid #448066;outline-offset:-2px}
+@media screen and (min-width:1151px) {#checklist .check-items:not([hidden]) {align-items:start} #checklist .packing-column .check-item:not(:first-child){border-top:1px solid var(--border)}}
+@media screen and (max-width:1150px){#checklist .check-items:not([hidden]) {gap:0} .packing-column {display:contents}}
+@media(min-width:901px) and (prefers-reduced-motion:no-preference){body,.site-header.sidebar-header {transition-duration:320ms;transition-timing-function:cubic-bezier(.22,.78,.22,1)} .sidebar-nav-wrap {transition:padding 320ms ease} .sidebar-pin-icon{transition:transform 240ms ease}}
+#autoPackStatus:empty {display:none}
+#rangeDays button.range-preview:not(.range-edge){background:#d7ebdf;border-radius:0}
