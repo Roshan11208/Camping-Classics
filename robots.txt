@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://camping-classics.pages.dev/sitemap.xml
