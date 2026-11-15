@@ -1120,10 +1120,8 @@ tripForm.addEventListener("submit", (event) => {
 
   saveTripStatus.textContent = "";
   requestAnimationFrame(() => {
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     masterChecklistToggle.focus({preventScroll:true});
-    document.getElementById("checklist").scrollIntoView({behavior:reduced?"instant":"smooth",block:"start"});
-    if (!reduced && checklistBody.animate) checklistBody.animate([{opacity:.45,transform:"translateY(7px)"},{opacity:1,transform:"none"}],{duration:340,easing:"ease-out"});
+    showChecklistSection();
   });
 });
 
@@ -1596,7 +1594,7 @@ function renderSavedTrips() {
 
       saveTripStatus.textContent = `Loaded "${trip.name}".`;
       trackEvent("open_saved_trip");
-      document.getElementById("checklist").scrollIntoView({ behavior: "smooth", block: "start" });
+      showChecklistSection();
     });
   });
 
@@ -1822,7 +1820,7 @@ if (importSharedTrip) {
 
     trackEvent("import_shared_trip");
     saveTripStatus.textContent = `Shared trip "${importedTrip.name}" saved.`;
-    document.getElementById("checklist").scrollIntoView({ behavior: "smooth", block: "start" });
+    showChecklistSection();
   });
 }
 
@@ -2880,4 +2878,24 @@ document.getElementById("autoPack").addEventListener("click",()=>{
   const count=packSuggested(currentChecklist,buildPackingSuggestions(collectPlannerSettings()));
   renderChecklist();renderSavedTrips();
   document.getElementById("autoPackStatus").textContent=count?count+" suggested item"+(count===1?"":"s")+" marked as packed.":"No additional suggested items to pack.";
+});
+
+function animateSectionArrival(section) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  section.animate([{opacity: 0.68, transform: "translateY(5px)"}, {opacity: 1, transform: "none"}],
+    {duration: 220, easing: "ease-out"});
+}
+
+function showChecklistSection() {
+  const section = document.getElementById("checklist");
+  section.scrollIntoView({behavior: "instant", block: "start"});
+  animateSectionArrival(section);
+}
+
+// Let the browser handle anchor focus, URL history and modifier keys.
+document.addEventListener("click", event => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const section = document.getElementById(link.hash.slice(1));
+  if (section) requestAnimationFrame(() => animateSectionArrival(section));
 });

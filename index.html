@@ -263,7 +263,7 @@
           <button class="btn primary" id="saveTripBtn" type="button">Save Current Trip</button>
           <span class="save-status" id="saveTripStatus" aria-live="polite"></span>
         </div>
-          <button class="btn secondary compact-btn" id="importChecklistExcel" type="button">Import spreadsheet</button>
+          <button class="btn secondary compact-btn" id="importChecklistExcel" title="Import checklist items from an Excel spreadsheet" type="button">Import spreadsheet</button>
         </div><!-- checklistBody -->
       </div>
     </section>
@@ -529,13 +529,20 @@
     <div class="container footer-content">
       <p>© <span id="year"></span> Camping Classics</p>
       <p>Built for beginner campers.</p>
+      <div class="footer-contact">
+        <strong>Contact</strong>
+        <ul>
+          <li>Email · <a href="mailto:campingclassics2026@gmail.com">campingclassics2026@gmail.com</a></li>
+          <li>Instagram · <a class="instagram-link" href="https://www.instagram.com/campingclassics/"><svg class="instagram-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.7" r="1.2" fill="currentColor"/></svg><span>@campingclassics</span></a></li>
+        </ul>
+      </div>
     </div>
     <button type="button" class="btn secondary" id="cookiesOpen">Cookie settings</button>
   </footer>
   <aside id="cookiesPanel" hidden aria-label="Analytics cookie settings">
     <strong>Help improve Camping Classics?</strong>
     <p>Optional Google Analytics cookies help us understand which features campers use. Your planner works either way. A preference cookie remembers your choice for six months.</p>
-    <button class="btn secondary" type="button" id="cookiesNo">Decline analytics</button>
+    <button class="btn secondary" type="button" id="cookiesNo">Deny cookies</button>
     <button class="btn secondary" type="button" id="cookiesYes">Allow cookies</button>
   </aside>
   <script defer src="privacy.js" integrity="sha384-ouV7c1yzV8VErQbLkL+t7nYtB6LRSO2kqC7WdknJYRZWSKYNDgkQ6B+Ig+uNfLEm"></script>
@@ -706,7 +713,7 @@
       <div class="excel-import-actions"><button class="btn secondary" id="backupBeforeExcelImport" type="button">Export current checklist</button><button class="btn secondary" id="cancelExcelImport" type="button">Cancel</button><button class="btn primary" id="applyExcelImport" type="button" disabled>Import items</button></div>
     </div>
   </div>
-  <script src="script.js" integrity="sha384-NqknBzN2JlJb5Ptxm6QdoL0yYOvXoEoRdWbDO9odv3mR3mS+dvl0q1ScCaEgaG1e"></script>
+  <script src="script.js" integrity="sha384-yyNuL8yhFhKBuJSUnXYHk2zwtnBRnyg6J4MXoQyQXXAoH56zUOOPna7yGvKNtg7P"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
   <script src="excel.js" integrity="sha384-40aTTNjnky2MELnieBucJLxne5rQJLgVg9zs42FShEB83W+5FZAJWpYK2dvHdsPh"></script>
 </body>
