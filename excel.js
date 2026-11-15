@@ -67,7 +67,7 @@
   function makeWorkbook(checklist) {
     if (!globalThis.XLSX) throw new Error('Excel tools could not load. Refresh the page and try again.');
     const rows = [['Category','Item','Quantity','Packed']];
-    Object.entries(checklist).forEach(([category,items]) => items.forEach(item => rows.push([String(category),String(item.label),clampQuantity(item.quantity),Boolean(item.checked)])));
+    Object.entries(checklist).forEach(([category,items]) => items.forEach(item => rows.push([String(category),String(item.label),clampQuantity(item.quantity),item.checked ? "Yes" : "No"])));
     const sheet = XLSX.utils.aoa_to_sheet(rows);
     sheet['!cols'] = [{wch:25},{wch:48},{wch:12},{wch:12}];
     sheet['!autofilter'] = {ref:sheet['!ref']};

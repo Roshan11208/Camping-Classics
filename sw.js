@@ -1,10 +1,11 @@
-const CACHE_NAME = "camping-classics-v48";
+const CACHE_NAME = "camping-classics-v49.1";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./script.js",
   "./manifest.webmanifest",
+  "./privacy.js",
   "./excel.js",
   "./excel-worker.js",
   "./vendor/xlsx-0.20.3.min.js"

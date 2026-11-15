@@ -2731,3 +2731,6 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
 @media(min-width:901px) and (prefers-reduced-motion:no-preference){body,.site-header.sidebar-header {transition-duration:320ms;transition-timing-function:cubic-bezier(.22,.78,.22,1)} .sidebar-nav-wrap {transition:padding 320ms ease} .sidebar-pin-icon{transition:transform 240ms ease}}
 #autoPackStatus:empty {display:none}
 #rangeDays button.range-preview:not(.range-edge){background:#d7ebdf;border-radius:0}
+#cookiesPanel:not([hidden]){position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);width:min(30rem,calc(100% - 2rem));padding:1rem;background:white;color:#19372c;border:1px solid #cddbd2;border-radius:14px;box-shadow:0 6px 24px #183b282b;z-index:1000}
+#cookiesPanel p{margin:.4rem 0 .75rem}#cookiesOpen{margin:.5rem}#importChecklistExcel{margin-top:.75rem}
+@media print{#cookiesPanel,#cookiesOpen,#importChecklistExcel{display:none!important}}
