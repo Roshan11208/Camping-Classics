@@ -1861,43 +1861,41 @@ feedbackConfirmation.addEventListener("click", event => {
   if (event.target === feedbackConfirmation) dismissFeedbackConfirmation();
 });
 if (feedbackForm) {
-  feedbackForm.addEventListener("submit", (event) => {
+  feedbackForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-
+    const button = feedbackForm.querySelector('button[type="submit"]');
+    if (button.disabled) return;
     const useful = new FormData(feedbackForm).get("feedbackUseful");
     const area = feedbackArea.value;
-    const comment = (feedbackComment?.value || "").trim().slice(0, 30);
-
+    const comment = feedbackComment.value.trim();
     if (!useful || !area) return;
-
-    trackEvent("feedback_submit", {
-      useful: String(useful),
-      improvement_area: area,
-      has_comment: Boolean(comment)
-    });
-
-    if (comment) {
-      try {
-        const localComments = JSON.parse(
-          localStorage.getItem("camping-classics-feedback-comments-v29") || "[]"
-        );
-
-        localComments.push({
-          comment,
-          area,
-          useful: String(useful),
-          createdAt: Date.now()
-        });
-
-        localStorage.setItem(
-          "camping-classics-feedback-comments-v29",
-          JSON.stringify(localComments.slice(-50))
-        );
-      } catch {
-        // Ignore local-storage failures.
-      }
+    const endpoint = feedbackForm.dataset.endpoint;
+    if (!endpoint) {
+      const link = document.createElement("a");
+      link.href = "mailto:campingclassics2026@gmail.com?" + new URLSearchParams({
+        subject: "Camping Classics feedback",
+        body: "Useful: " + useful + "\nArea: " + area + "\nComment: " + comment
+      }).toString().replace(/\+/g, "%20");
+      link.textContent = "Open email draft";
+      feedbackStatus.replaceChildren("Email your feedback to Camping Classics: ", link);
+      return;
     }
-
+    button.disabled = true;
+    feedbackStatus.textContent = "Sending feedback…";
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {"Accept": "application/json", "Content-Type": "application/json"},
+        body: JSON.stringify({usefulness: useful, improvement_area: area, comment})
+      });
+      if (!response.ok) throw new Error("Submission failed");
+    } catch {
+      feedbackStatus.textContent = "Feedback could not be sent. Your answers are here so you can try again.";
+      return;
+    } finally {
+      button.disabled = false;
+    }
+    trackEvent("feedback_submit", {useful: String(useful), improvement_area: area, has_comment: Boolean(comment)});
     feedbackStatus.textContent = "";
     feedbackForm.reset();
 
