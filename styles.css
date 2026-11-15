@@ -2745,3 +2745,10 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
 .footer-contact .instagram-link {display:inline-flex;align-items:center;gap:.4rem;vertical-align:middle}
 .instagram-icon {flex:none;color:#ffd074}
 .instagram-link:hover,.instagram-link:focus-visible {color:white}
+
+.import-control {position:relative;display:inline-block}
+#import-tip {position:absolute;bottom:100%;left:0;width:max-content;max-width:min(15rem,80vw);padding:.45rem .7rem;border-radius:.5rem;background:#19372c;color:white;visibility:hidden;z-index:3}
+.import-control:hover #import-tip,.import-control:focus-within #import-tip {visibility:visible}
+#importColumns {margin:1rem 0}
+#importColumns label {display:block;margin:.5rem 0}
+@media print {.import-control {display:none}}

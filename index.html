@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=52" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163e32'/%3E%3Cpath d='M5 25L16 6L27 25ZM12 25L16 17L20 25' fill='none' stroke='%23f0b95a' stroke-width='2'/%3E%3C/svg%3E" />
@@ -263,7 +263,7 @@
           <button class="btn primary" id="saveTripBtn" type="button">Save Current Trip</button>
           <span class="save-status" id="saveTripStatus" aria-live="polite"></span>
         </div>
-          <button class="btn secondary compact-btn" id="importChecklistExcel" title="Import checklist items from an Excel spreadsheet" type="button">Import spreadsheet</button>
+          <span class="import-control"><button class="btn secondary compact-btn" id="importChecklistExcel" aria-describedby="import-tip" type="button">Import spreadsheet</button><span id="import-tip" role="tooltip">Import your camping Excel or CSV file</span></span>
         </div><!-- checklistBody -->
       </div>
     </section>
@@ -528,7 +528,7 @@
   <footer>
     <div class="container footer-content">
       <p>© <span id="year"></span> Camping Classics</p>
-      <p>Built for beginner campers.</p>
+      <p>Built for beginner campers. · v52</p>
       <div class="footer-contact">
         <strong>Contact</strong>
         <ul>
@@ -697,10 +697,17 @@
     <div class="site-modal excel-import-modal" role="dialog" aria-modal="true" aria-labelledby="excelImportTitle" tabindex="-1">
       <button class="modal-close" id="closeExcelImport" type="button" aria-label="Close spreadsheet import">×</button>
       <h2 id="excelImportTitle">Import your checklist</h2>
-      <p class="modal-copy">Choose an Excel or CSV file with Item, Category, Quantity, and Packed columns. Only Item is required; missing quantities start at 0. Files are read on this device.</p>
+      <p class="modal-copy">Add your camping Excel or CSV file. Each item needs a name. Include counts if you have them. New items without a count start at 0. Preview their sections before importing.</p>
       <label class="excel-file-label">Spreadsheet<input id="excelImportFile" type="file" accept=".xlsx,.xls,.csv" /></label>
       <p class="device-note">Up to 2 MB and 1,000 items. Use the template for an example. Formula cells are not supported.</p>
       <label id="excelSheetLabel" hidden>Worksheet<select id="excelImportSheet"></select></label>
+      <details id="importColumns" hidden><summary>Adjust spreadsheet columns and starting row</summary>
+        <label>Item name <select id="import-item"></select></label>
+        <label>Count <select id="import-quantity"></select></label>
+        <label>Section <select id="import-category"></select></label>
+        <label>Packed <select id="import-packed"></select></label>
+        <label>First item row <input type="number" min="1" id="import-first"></label>
+      </details>
       <p id="excelImportStatus" role="status" aria-live="polite"></p>
       <div id="excelPreviewWrap" class="excel-preview-wrap" hidden>
         <table class="excel-preview"><caption>Checklist preview</caption><thead><tr><th>Category</th><th>Item</th><th>Quantity</th><th>Packed</th></tr></thead><tbody id="excelPreviewRows"></tbody></table>
@@ -708,13 +715,13 @@
       <fieldset id="excelImportModes" class="excel-import-modes" hidden><legend>How should these items be imported?</legend>
         <label><input type="radio" name="excelImportMode" value="add" checked /> Add to current checklist</label>
         <label><input type="radio" name="excelImportMode" value="replace" /> Replace current checklist</label>
-        <p class="device-note">Adding skips existing items with the same category and name. Replacing removes the current items after confirmation.</p>
+        <p class="device-note">Adding updates matching items with the counts you provide. Replacing removes the current items after confirmation.</p>
       </fieldset>
       <div class="excel-import-actions"><button class="btn secondary" id="backupBeforeExcelImport" type="button">Export current checklist</button><button class="btn secondary" id="cancelExcelImport" type="button">Cancel</button><button class="btn primary" id="applyExcelImport" type="button" disabled>Import items</button></div>
     </div>
   </div>
   <script src="script.js" integrity="sha384-yyNuL8yhFhKBuJSUnXYHk2zwtnBRnyg6J4MXoQyQXXAoH56zUOOPna7yGvKNtg7P"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
-  <script src="excel.js" integrity="sha384-40aTTNjnky2MELnieBucJLxne5rQJLgVg9zs42FShEB83W+5FZAJWpYK2dvHdsPh"></script>
+  <script src="excel.js?v=52" integrity="sha384-AKIotGl8y8L0cih5GBUvwnV6ocQwNoMfA19/odNG74Gn0FGqtike/jw80+2Lm92b"></script>
 </body>
 </html>
