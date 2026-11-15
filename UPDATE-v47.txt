@@ -1,0 +1,11 @@
+Camping Classics v47 — Excel checklist tools and sidebar arrow
+
+Upload the contents of this ZIP into the folder that currently contains your website index.html. Replace index.html, styles.css, and sw.js. Add excel.js, excel-worker.js, and the entire vendor folder. Keep script.js, manifest.webmanifest, and all other existing files.
+
+Excel: Export the complete checklist as .xlsx. Download the template or import .xlsx, .xls, or .csv files. Preview a worksheet, then add items or replace the checklist after confirmation. Category, Item, Quantity (0–99), and Packed (Yes/No or True/False) columns are supported; only Item is required. Missing quantities start at 0 and items are unchecked unless marked packed in the sheet. Imports are limited to 2 MB, 1,000 items, 10 worksheets, and 30 columns. Formula/error cells are rejected; use values. Files are read on the visitor's device. This is file import/export, not live synchronization with Microsoft Excel.
+
+The sidebar toggle uses a centered SVG arrow, reverses when pinned, and has more room below the brand.
+
+After deploying, accept the site's update prompt or refresh. Test on your hosted website rather than opening index.html as a local file. If the old version persists, close existing tabs and reopen or try incognito.
+
+New vendor files include SheetJS Community Edition 0.20.3 and its license. Keep both files.
