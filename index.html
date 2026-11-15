@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
-  <link rel="stylesheet" href="styles.css?v=54" />
+  <link rel="stylesheet" href="styles.css?v=56" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163e32'/%3E%3Cpath d='M5 25L16 6L27 25ZM12 25L16 17L20 25' fill='none' stroke='%23f0b95a' stroke-width='2'/%3E%3C/svg%3E" />
@@ -44,7 +44,12 @@
           <p class="hero-copy">Plan the days. Pack the essentials. Make room for the good stuff.</p>
           <div class="hero-actions"><a class="btn primary" href="#planner">Plan a trip</a><a class="btn secondary" href="#saved-trips">My saved trips</a></div>
         </div>
-        <div class="hero-photo-wrap"><img class="hero-photo" src="https://images.unsplash.com/photo-1760715650044-4e588c2dd2e2?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=75&w=1600" alt="Tent at a mountain campsite around sunrise" loading="eager"><a class="hero-photo-credit" href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
+        <div class="hero-photo-wrap">
+          <div class="hero-slide"><img class="hero-photo" src="https://images.unsplash.com/photo-1760715650044-4e588c2dd2e2?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=75&w=1600" alt="Tent at a mountain campsite around sunrise" loading="eager"><a class="hero-photo-credit" href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
+          <div class="hero-slide" hidden><img class="hero-photo" src="https://www.oars.com/wp-content/uploads/2022/08/gsi_2017_campfire_03_f_web-1680x900.jpg" loading="eager" decoding="async" referrerpolicy="no-referrer" alt="Campfire at a campsite"><a class="hero-photo-credit" target="_blank" rel="noopener noreferrer" href="https://www.oars.com/blog/camping-tips-the-complete-guide/">OARS</a></div>
+          <div class="hero-slide" hidden><img class="hero-photo" src="https://educationalrenaissance.com/wp-content/uploads/2025/11/Camping.png" loading="eager" decoding="async" referrerpolicy="no-referrer" alt="Outdoor camping scene"><a class="hero-photo-credit" target="_blank" rel="noopener noreferrer" href="https://educationalrenaissance.com/2025/11/29/on-the-benefits-of-camping/">Educational Renaissance</a></div>
+          <button type="button" id="heroRotation" hidden>Pause photos</button>
+        </div>
       </div>
     </section>
     <section class="section" id="planner">
@@ -340,10 +345,6 @@
           <h2>Easy activities for groups</h2>
           <p>Start with six favorites, then open the rest if you want more ideas.</p>
         </div>
-        <figure class="camping-photo">
-          <img src="https://www.oars.com/wp-content/uploads/2022/08/gsi_2017_campfire_03_f_web-1680x900.jpg" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Campfire at a campsite">
-          <figcaption><a href="https://www.oars.com/blog/camping-tips-the-complete-guide/">OARS</a></figcaption>
-        </figure>
 
         <div class="game-grid" id="gameGrid">
           <!-- First 6 -->
@@ -441,10 +442,6 @@
           <h2>Find campgrounds near you</h2>
           <p>Use your current location or enter a U.S. city or ZIP code. Camping Classics will list the closest campsites within about 40 miles.</p>
         </div>
-        <figure class="camping-photo">
-          <img src="https://educationalrenaissance.com/wp-content/uploads/2025/11/Camping.png" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Outdoor camping scene">
-          <figcaption><a href="https://educationalrenaissance.com/2025/11/29/on-the-benefits-of-camping/">Educational Renaissance</a></figcaption>
-        </figure>
 
         <div class="camp-finder-card">
           <div class="finder-main">
@@ -725,5 +722,6 @@
   <script src="script.js?v=54" integrity="sha384-V6DdzczHAt+QzbYLOYodPUQsAIAtDOXMwmie4JRsvUb22P4cZvD7LFNxKQUZZdjh"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
   <script src="excel.js?v=52" integrity="sha384-AKIotGl8y8L0cih5GBUvwnV6ocQwNoMfA19/odNG74Gn0FGqtike/jw80+2Lm92b"></script>
+  <script src="hero-photos.js" integrity="sha384-zz3sL/JWPk6KTCzZInkL+mpV3ghQQiBfMak19hh/K17W1w2WC0DvhuNTGqr+muZe"></script>
 </body>
 </html>

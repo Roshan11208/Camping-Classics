@@ -2762,7 +2762,5 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
 .footer-base #cookiesOpen {margin:0 0 0 auto;background:transparent;color:inherit;border:0;text-decoration:underline;cursor:pointer;font:inherit}
 @media(max-width:700px){.footer-overview{grid-template-columns:1fr;gap:1.25rem}.footer-base{padding-bottom:3rem}.footer-base #cookiesOpen{margin:0}}
 
-.camping-photo {position:relative;margin:0 0 1.25rem;border-radius:16px;overflow:hidden}
-.camping-photo img {display:block;width:100%;height:clamp(9rem,21vw,16rem);object-fit:cover}
-.camping-photo figcaption {position:absolute;right:.6rem;bottom:.6rem;font-size:.75rem}
-.camping-photo a {color:white;background:#183329;padding:.3rem .55rem;border-radius:6px}
+.hero-slide {height:100%}
+#heroRotation {position:absolute;bottom:10px;left:10px;background:#14251bea;color:white;border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;cursor:pointer}
