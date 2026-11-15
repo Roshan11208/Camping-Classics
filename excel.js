@@ -167,14 +167,38 @@
   }
   $('importChecklistExcel').addEventListener('click',()=>{
     returnFocus=document.activeElement;pending=[];sheets=[];
-    $('excelImportFile').value='';$('excelImportStatus').textContent='Choose a file to preview its items.';
+    $('uploadName').hidden=true;$('excelImportFile').value='';$('excelImportStatus').textContent='Choose a file to preview its items.';
     $('excelPreviewWrap').hidden=true;$('excelImportModes').hidden=true;$('excelSheetLabel').hidden=true;$('importColumns').hidden=true;$('applyExcelImport').disabled=true;
     document.querySelector('input[name="excelImportMode"][value="add"]').checked=true;
     openSiteModal(modal);$('excelImportFile').focus();
   });
-  $('excelImportFile').addEventListener('change',async event=>{
+  const fileInput = $('excelImportFile');
+  const dropZone = $('sheetDrop');
+  fileInput.addEventListener('change', () => readFiles(fileInput.files));
+  dropZone.addEventListener('dragover', event => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    dropZone.classList.add('dragging');
+  });
+  dropZone.addEventListener('dragleave', event => {
+    if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove('dragging');
+  });
+  dropZone.addEventListener('drop', event => {
+    event.preventDefault();
+    dropZone.classList.remove('dragging');
+    fileInput.value = '';
+    readFiles(event.dataTransfer.files);
+  });
+  async function readFiles(files) {
     stopReading(); pending=[];$('applyExcelImport').disabled=true;$('excelPreviewWrap').hidden=true;$('excelImportModes').hidden=true;$('excelSheetLabel').hidden=true;$('importColumns').hidden=true;
-    const file=event.target.files?.[0];if(!file)return;
+    $('uploadName').hidden = true;
+    if (files.length !== 1) {
+      $('excelImportStatus').textContent = 'Choose one spreadsheet at a time.';
+      return;
+    }
+    const file = files[0];
+    $('uploadName').textContent = file.name;
+    $('uploadName').hidden = false;
     if(!/\.(xlsx|xls|csv)$/i.test(file.name)||file.size>2*1024*1024){$('excelImportStatus').textContent='Choose a .xlsx, .xls, or .csv file smaller than 2 MB.';return;}
     $('excelImportStatus').textContent='Reading spreadsheet…';
     let task;
@@ -192,7 +216,7 @@
     task.onerror=()=>{if(worker!==task)return;stopReading();$('excelImportStatus').textContent='Could not read the spreadsheet. Refresh and try the template.';};
     try {const buffer=await file.arrayBuffer();if(worker===task)task.postMessage(buffer,[buffer]);}
     catch(_){if(worker===task){stopReading();$('excelImportStatus').textContent='The selected file could not be opened.';}}
-  });
+  }
   $('excelImportSheet').addEventListener('change',selectSheet);
   $('applyExcelImport').addEventListener('click',()=>{
     if(!pending.length)return;
