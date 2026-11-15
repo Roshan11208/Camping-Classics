@@ -2752,3 +2752,12 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
 #importColumns {margin:1rem 0}
 #importColumns label {display:block;margin:.5rem 0}
 @media print {.import-control {display:none}}
+
+.footer-overview {display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:clamp(2rem,6vw,6rem);align-items:start}
+.footer-overview h2 {margin:0;color:#fff;font-size:clamp(1.3rem,2vw,1.7rem);line-height:1.2}
+.footer-overview section p {max-width:62ch;margin:.65rem 0 0}
+.footer-contact a {overflow-wrap:anywhere}
+.footer-base {display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.5rem;margin-top:1.4rem;padding-top:1rem;border-top:1px solid #466052;font-size:.9rem}
+.footer-base p {margin:0}
+.footer-base #cookiesOpen {margin:0 0 0 auto;background:transparent;color:inherit;border:0;text-decoration:underline;cursor:pointer;font:inherit}
+@media(max-width:700px){.footer-overview{grid-template-columns:1fr;gap:1.25rem}.footer-base{padding-bottom:3rem}.footer-base #cookiesOpen{margin:0}}

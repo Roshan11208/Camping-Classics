@@ -1,8 +1,8 @@
-const CACHE_NAME = "camping-classics-v52";
+const CACHE_NAME = "camping-classics-v53";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=52",
+  "./styles.css?v=53",
   "./script.js",
   "./manifest.webmanifest",
   "./privacy.js",

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
-  <link rel="stylesheet" href="styles.css?v=52" />
+  <link rel="stylesheet" href="styles.css?v=53" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163e32'/%3E%3Cpath d='M5 25L16 6L27 25ZM12 25L16 17L20 25' fill='none' stroke='%23f0b95a' stroke-width='2'/%3E%3C/svg%3E" />
@@ -509,26 +509,15 @@
       </div>
     </section>
 
-    <section class="section camping-overview" id="camping-overview" aria-labelledby="campingOverviewHeading">
-      <div class="container">
-        <div class="camping-overview-card">
-          <h2 id="campingOverviewHeading">Free Camping Trip Planner &amp; Packing Checklist</h2>
-          <p class="camping-overview-description">Planning your next camping trip? Camping Classics helps beginners, families, and outdoor enthusiasts organize their adventures in one place. Create personalized packing checklists, organize daily activities, plan meals, discover nearby campgrounds, and explore fun camping games.</p>
-          <ul class="camping-overview-features">
-            <li><h3>Personalized Packing Checklists</h3><p>Generate packing lists based on trip details.</p></li>
-            <li><h3>Daily Trip Planning</h3><p>Organize activities and notes for each day.</p></li>
-            <li><h3>Campground Finder</h3><p>Discover camping locations near you.</p></li>
-            <li><h3>Camping Games</h3><p>Explore games and activities for friends and family.</p></li>
-          </ul>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>
-    <div class="container footer-content">
-      <p>© <span id="year"></span> Camping Classics</p>
-      <p>Built for beginner campers. · v52</p>
+    <div class="container">
+      <div class="footer-overview">
+        <section aria-labelledby="campingOverviewHeading">
+          <h2 id="campingOverviewHeading">Free Camping Trip Planner &amp; Packing Checklist</h2>
+          <p>Build a packing list for your group, plan each day, find nearby campgrounds, and pick games for your trip.</p>
+        </section>
       <div class="footer-contact">
         <strong>Contact</strong>
         <ul>
@@ -537,7 +526,12 @@
         </ul>
       </div>
     </div>
-    <button type="button" class="btn secondary" id="cookiesOpen">Cookie settings</button>
+      <div class="footer-base">
+        <p>© <span id="year"></span> Camping Classics</p>
+        <p>Built for beginner campers.</p>
+        <button type="button" id="cookiesOpen">Cookie settings</button>
+      </div>
+    </div>
   </footer>
   <aside id="cookiesPanel" hidden aria-label="Analytics cookie settings">
     <strong>Help improve Camping Classics?</strong>
