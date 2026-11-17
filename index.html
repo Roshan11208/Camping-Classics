@@ -6,6 +6,7 @@
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
   <link rel="stylesheet" href="styles.css?v=57" />
+  <link rel="stylesheet" href="card-browser.css?v=58" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163e32'/%3E%3Cpath d='M5 25L16 6L27 25ZM12 25L16 17L20 25' fill='none' stroke='%23f0b95a' stroke-width='2'/%3E%3C/svg%3E" />
@@ -291,146 +292,256 @@
       </div>
     </section>
 
-    <section class="section" id="guides">
+    <section class="section" id="guides" aria-labelledby="guidesTitle">
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow">Beginner Guides</p>
-          <h2>Camping basics in simple language</h2>
+          <h2 id="guidesTitle">Camping basics in simple language</h2>
+          <p>A little know-how for a more comfortable first trip.</p>
         </div>
-
-        <div class="card-grid">
-          <article class="info-card">
-            <span class="icon">⛺</span>
+        <div class="card-browser" data-card-browser>
+          <div class="browse-toolbar" hidden>
+            <p class="browse-hint" id="guidesHint"><span class="browse-hint-touch">Swipe left or right to explore</span><span class="browse-hint-desktop">Use the arrows to explore</span></p>
+            <div class="browse-controls">
+              <p class="browse-count" role="status" aria-live="polite" aria-atomic="true"></p>
+              <button class="browse-arrow browse-previous" type="button" aria-label="Previous guides" aria-controls="guideGrid" aria-disabled="true"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+              <button class="browse-arrow browse-next" type="button" aria-label="Next guides" aria-controls="guideGrid"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+            </div>
+          </div>
+          <div class="browse-track" id="guideGrid" aria-label="Camping guides">
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">⛺</span><span class="browse-number" aria-hidden="true">01</span></div>
             <h3>Setting Up Camp</h3>
-            <p>Choose a flat area, keep your sleeping area dry, and organize your gear before dark.</p>
+            <p class="browse-summary">Choose a flat spot, settle in before dark, and give everything a place.</p>
+            
+            <details class="browse-details">
+              <summary aria-label="Read more about Setting Up Camp">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>Try these simple steps</h4><ol><li>Use the designated tent area and look for a flat spot. Avoid low spots where rainwater collects.</li><li>Put up your tent before dark so you have time to check the setup instructions.</li><li>Arrange your sleeping gear, then give shoes, lights, and bags a place you can find easily.</li></ol></div>
+            </details>
           </article>
-
-          <article class="info-card">
-            <span class="icon">🌧️</span>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🌧️</span><span class="browse-number" aria-hidden="true">02</span></div>
             <h3>Preparing for Rain</h3>
-            <p>Pack a rain jacket, keep clothes in sealed bags, and avoid placing your tent in low areas.</p>
+            <p class="browse-summary">Keep your sleeping space and spare clothes dry when the weather changes.</p>
+            
+            <details class="browse-details">
+              <summary aria-label="Read more about Preparing for Rain">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>Try these simple steps</h4><ol><li>Check the forecast before leaving and bring a rain jacket.</li><li>Keep spare clothes and sleeping gear in waterproof or sealed bags.</li><li>Set up your rainfly according to your tent instructions. Keep gear away from the tent walls and avoid low ground.</li></ol></div>
+            </details>
           </article>
-
-          <article class="info-card">
-            <span class="icon">🧭</span>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🧭</span><span class="browse-number" aria-hidden="true">03</span></div>
             <h3>Campground Basics</h3>
-            <p>Know your campsite rules, keep your site clean, and respect quiet hours and nearby campers.</p>
+            <p class="browse-summary">Know the rules, find the facilities, and be a considerate neighbor.</p>
+            
+            <details class="browse-details">
+              <summary aria-label="Read more about Campground Basics">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>Try these simple steps</h4><ol><li>Read the campground rules when you arrive, including quiet hours and any current fire restrictions.</li><li>Find the toilets, drinking-water point, and trash area. Let your group know where they are.</li><li>Keep your campsite tidy and give nearby campers space. Follow the campground’s food-storage instructions.</li></ol></div>
+            </details>
           </article>
-
-          <article class="info-card">
-            <span class="icon">🗑️</span>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🗑️</span><span class="browse-number" aria-hidden="true">04</span></div>
             <h3>Leave No Trace</h3>
-            <p>Pack out your trash, avoid damaging plants, and leave the campsite as clean as you found it.</p>
+            <p class="browse-summary">Enjoy your campsite and leave it ready for the next campers.</p>
+            
+            <details class="browse-details">
+              <summary aria-label="Read more about Leave No Trace">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>Try these simple steps</h4><ol><li>Bring trash bags and collect food scraps, wrappers, and other rubbish before you leave.</li><li>Stay on established paths and use designated camping areas to protect plants.</li><li>Leave rocks, plants, and natural objects where you find them. Give wildlife space and do not feed it.</li></ol></div>
+            </details>
           </article>
-
-          <article class="info-card">
-            <span class="icon">🔦</span>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🔦</span><span class="browse-number" aria-hidden="true">05</span></div>
             <h3>Nighttime Setup</h3>
-            <p>Keep a flashlight close, organize shoes and gear, and make sure everyone knows the campsite layout.</p>
+            <p class="browse-summary">Put the things you will need after dark within easy reach.</p>
+            
+            <details class="browse-details">
+              <summary aria-label="Read more about Nighttime Setup">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>Try these simple steps</h4><ol><li>Keep a flashlight or headlamp close to your sleeping spot and check that it works.</li><li>Put shoes and a warm layer where you can find them without emptying your bag.</li><li>Before dark, show everyone the path between your tent and the campground facilities. Keep paths clear of loose gear.</li></ol></div>
+            </details>
           </article>
-
-          <article class="info-card">
-            <span class="icon">🥾</span>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🥾</span><span class="browse-number" aria-hidden="true">06</span></div>
             <h3>What Beginners Forget</h3>
-            <p>Extra socks, a backup light, water, trash bags, weather-ready clothing, and a simple first-aid kit.</p>
+            <p class="browse-summary">Do one last check for the small things that make a big difference.</p>
+            
+            <details class="browse-details">
+              <summary aria-label="Read more about What Beginners Forget">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>Try these simple steps</h4><ol><li>Check your list for spare socks, weather-ready layers, and a backup light.</li><li>Bring drinking water, trash bags, and a simple first-aid kit.</li><li>Walk through a pretend day at camp: sleeping, eating, getting dressed, and cleaning up. Add anything you would reach for to your checklist.</li></ol></div>
+            </details>
           </article>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section alt" id="games">
+    <section class="section alt" id="games" aria-labelledby="gamesTitle">
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow">Camping Games</p>
-          <h2>Easy activities for groups</h2>
-          <p>Start with six favorites, then open the rest if you want more ideas.</p>
+          <h2 id="gamesTitle">Easy activities for groups</h2>
+          <p>Find your next camp favorite. Pick a game and open the instructions when you’re ready.</p>
         </div>
-
-        <div class="game-grid" id="gameGrid">
-          <!-- First 6 -->
-          <div class="game-card">
+        <div class="card-browser" data-card-browser>
+          <div class="browse-toolbar" hidden>
+            <p class="browse-hint" id="gamesHint"><span class="browse-hint-touch">Swipe left or right to explore</span><span class="browse-hint-desktop">Use the arrows to explore</span></p>
+            <div class="browse-controls">
+              <p class="browse-count" role="status" aria-live="polite" aria-atomic="true"></p>
+              <button class="browse-arrow browse-previous" type="button" aria-label="Previous games" aria-controls="gameGrid" aria-disabled="true"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+              <button class="browse-arrow browse-next" type="button" aria-label="Next games" aria-controls="gameGrid"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+            </div>
+          </div>
+          <div class="browse-track" id="gameGrid" aria-label="Camping games">
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🌙</span><span class="browse-number" aria-hidden="true">01</span></div>
+            <h3>Mafia</h3>
+            <p class="browse-summary">Secret roles, clever questions, and a group vote. Can the town find the mafia?</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>6+ people</dd></div><div><dt>Bring</dt><dd>Paper slips + a pen</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Mafia">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>For a simple six-person round, choose one moderator. Secretly assign one mafia role and four town roles using paper slips.</li><li>At “night,” everyone closes their eyes. The moderator asks the mafia to look up and silently choose someone to leave the round, then close their eyes.</li><li>At “day,” the moderator announces who is out. The remaining players discuss and vote someone out; reveal that person’s role. On a tied vote, nobody leaves.</li><li>Repeat night and day. The town wins by voting out the mafia. The mafia wins when only one town player remains. People who are out watch quietly until the next round.</li><li>For a larger group, agree on the roles first; two mafia work well with eight or more active players. The mafia wins when its number matches the remaining town players.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🃏</span><span class="browse-number" aria-hidden="true">02</span></div>
+            <h3>UNO</h3>
+            <p class="browse-summary">Match colors and numbers, play action cards, and race to empty your hand.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>2–10 players</dd></div><div><dt>Bring</dt><dd>An UNO deck</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about UNO">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Deal seven cards to each player. Make a face-down draw pile and turn over its top card to start a discard pile.</li><li>Take turns matching the top discard by color, number, or symbol, or play an allowed Wild card. Follow your deck’s rules for action cards.</li><li>If you have no playable card, draw one. You may play it immediately if it fits; otherwise your turn ends.</li><li>Say “UNO” when you have one card left. The first person with an empty hand wins the round. For scoring and special-card details, use the rules that came with your deck.</li></ol><p class="browse-source"><a href="https://service.mattel.com/instruction_sheets/W2085.pdf" target="_blank" rel="noopener noreferrer">Official UNO rules (PDF)</a></p></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">💬</span><span class="browse-number" aria-hidden="true">03</span></div>
+            <h3>Telephone</h3>
+            <p class="browse-summary">Pass a whispered message around the group and see how much it changes.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>4+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Telephone">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Sit in a line or circle. The first person thinks of a short, funny sentence.</li><li>Whisper it once to the next person. Each person quietly passes along what they heard.</li><li>The last person says the message aloud. Compare it with the original, then choose a new starting player.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🕵️</span><span class="browse-number" aria-hidden="true">04</span></div>
             <h3>Imposter</h3>
-            <p>Everyone gets the same secret word except one person. Players give short clues, then try to figure out who the imposter is before the imposter guesses the word.</p>
-            <span>Best for 4+ players</span>
-          </div>
-
-          <div class="game-card">
+            <p class="browse-summary">Give clues about a secret word and spot the player who does not know it.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>4+ players</dd></div><div><dt>Bring</dt><dd>Paper slips + a pen</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Imposter">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Prepare one slip per player. Put the same secret word on every slip except one, which says “imposter.” Shuffle and hand them out.</li><li>Go around the circle giving one short clue each without saying the word. The imposter tries to blend in.</li><li>Discuss the clues and vote. If the group finds the imposter, give that player one chance to guess the secret word before revealing it.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🚀</span><span class="browse-number" aria-hidden="true">05</span></div>
             <h3>Among Us — Camp Edition</h3>
-            <p>Assign simple crewmate tasks around camp while one or two imposters secretly try to blend in. Hold quick discussion rounds and vote on who seems suspicious.</p>
-            <span>Best for larger groups</span>
-          </div>
-
-          <div class="game-card">
+            <p class="browse-summary">Finish small tasks around camp while a secret imposter tries to blend in.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>6+ players</dd></div><div><dt>Bring</dt><dd>Role slips + task list</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Among Us — Camp Edition">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Choose a host and an agreed play area. Give everyone a secret role, with one imposter and the rest crewmates.</li><li>Set simple tasks such as sorting cards or counting tent pegs. The imposter pretends to complete tasks; keep this version contact-free.</li><li>After a few minutes, stop for a discussion and vote. Reveal the voted player’s role, then start another round with new roles.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🎭</span><span class="browse-number" aria-hidden="true">06</span></div>
             <h3>Charades</h3>
-            <p>Act out a word, movie, animal, activity, or camping-themed prompt without speaking while your team tries to guess it.</p>
-            <span>No equipment needed</span>
-          </div>
-
-          <div class="game-card">
+            <p class="browse-summary">Act out a prompt without speaking while your team tries to guess.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>4+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Charades">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Split into two teams. The other team gives the actor a word, animal, movie, or camping activity.</li><li>Act it out without words or sound effects. Give the team one minute to guess.</li><li>Award a point for a correct answer, then switch teams and actors. Play to an agreed score.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🏅</span><span class="browse-number" aria-hidden="true">07</span></div>
             <h3>Camp Olympics</h3>
-            <p>Create a few harmless mini-events such as a sock toss, balance challenge, trivia round, or fastest sleeping-bag roll-up.</p>
-            <span>Good for teams</span>
-          </div>
-
-          <div class="game-card">
+            <p class="browse-summary">Turn a few simple challenges into a friendly team competition.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>4+ players</dd></div><div><dt>Bring</dt><dd>Socks + camp gear</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Camp Olympics">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Choose three easy events, such as a rolled-sock toss, trivia round, and sleeping-bag roll-up.</li><li>Split into teams and agree on a score for each event. Use a clear space away from other campers.</li><li>Let everyone try each event, add the points, and celebrate the team with the highest total.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🤔</span><span class="browse-number" aria-hidden="true">08</span></div>
             <h3>Two Truths and a Lie</h3>
-            <p>Each person says three statements about themselves. Two are true and one is made up. Everyone guesses the lie.</p>
-            <span>Great icebreaker</span>
-          </div>
-
-          <div class="game-card">
+            <p class="browse-summary">Share three things about yourself and let the group find the made-up one.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>3+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Two Truths and a Lie">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Think of two true statements about yourself and one believable made-up statement.</li><li>Say all three in any order. Let the group ask a few questions and guess the lie.</li><li>Reveal the answer, share the story if you like, and move to the next person.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">📖</span><span class="browse-number" aria-hidden="true">09</span></div>
             <h3>Story Chain</h3>
-            <p>One person starts a story with one sentence. Each player adds one sentence, creating a completely unpredictable group story.</p>
-            <span>Best around the campfire</span>
-          </div>
-
-          <!-- Next 6: roughly most popular/common to more niche -->
-          <div class="game-card extra-game" hidden>
+            <p class="browse-summary">Build a silly group story, one unexpected sentence at a time.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>3+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Story Chain">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>One player starts with a single sentence, such as “We opened the tent and found a tiny dragon.”</li><li>Go around the group. Each player adds one sentence that connects to the story.</li><li>After a few rounds, let the next player give the story an ending. Start again with a new theme.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">↔️</span><span class="browse-number" aria-hidden="true">10</span></div>
             <h3>Would You Rather?</h3>
-            <p>Take turns asking two funny or difficult choices. Everyone picks one and explains why.</p>
-            <span>Good for any group size</span>
-          </div>
-
-          <div class="game-card extra-game" hidden>
+            <p class="browse-summary">Pick between two funny choices and explain your answer.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>2+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Would You Rather?">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Offer two choices, such as camping by a lake or camping in the mountains.</li><li>Let everyone choose and explain why. Keep questions comfortable for the group and allow anyone to pass.</li><li>Take turns asking the next question. There are no points or wrong answers.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">❓</span><span class="browse-number" aria-hidden="true">11</span></div>
             <h3>20 Questions</h3>
-            <p>One person thinks of an object, place, or character. Everyone else gets up to twenty yes-or-no questions to figure it out.</p>
-            <span>Easy around camp</span>
-          </div>
-
-          <div class="game-card extra-game" hidden>
+            <p class="browse-summary">Use yes-or-no questions to uncover a mystery object, place, or character.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>2+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about 20 Questions">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>One person secretly chooses an object, place, or character.</li><li>The group can ask up to twenty questions that can be answered with yes or no. Count each guess as a question.</li><li>If someone guesses correctly, they choose the next mystery. Otherwise, reveal the answer after question twenty.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🍃</span><span class="browse-number" aria-hidden="true">12</span></div>
             <h3>Campground Scavenger Hunt</h3>
-            <p>Create a list of safe things to spot, such as a pinecone, bird, trail sign, interesting rock, or a certain color in nature.</p>
-            <span>Great during daylight</span>
-          </div>
-
-          <div class="game-card extra-game" hidden>
+            <p class="browse-summary">Look for little details in nature and compare what your group finds.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>2+ players</dd></div><div><dt>Bring</dt><dd>A short list + a pen</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Campground Scavenger Hunt">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Make a short list of things to spot, such as a pinecone, bird, trail sign, or something yellow.</li><li>Agree on boundaries and a return time. Stay on permitted paths and play during daylight.</li><li>Tick off what you see or take photos. Leave natural objects where they are, then compare your finds.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">🔦</span><span class="browse-number" aria-hidden="true">13</span></div>
             <h3>Flashlight Tag</h3>
-            <p>In an open, permitted area after dark, one player searches while others stay within agreed boundaries. Keep the area hazard-free and follow campground quiet-hour rules.</p>
-            <span>Outdoor nighttime game</span>
-          </div>
-
-          <div class="game-card extra-game" hidden>
+            <p class="browse-summary">Try a slow, quiet spotting game within an agreed area after dark.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>4+ players</dd></div><div><dt>Bring</dt><dd>Flashlights</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Flashlight Tag">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Use a permitted, open area with clear boundaries, away from roads, water, fire, and trip hazards. Skip this game if there is no suitable space.</li><li>Choose one seeker. Others walk to a spot within the boundaries; keep the game walking-only and respect quiet hours.</li><li>The seeker spots someone with the light and says their name. Keep light out of people’s eyes. Switch seekers after the round.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">💡</span><span class="browse-number" aria-hidden="true">14</span></div>
             <h3>Categories</h3>
-            <p>Choose a category such as foods, animals, movies, or places. Go around the group naming something new until someone repeats or gets stuck.</p>
-            <span>Fast and simple</span>
-          </div>
-
-          <div class="game-card extra-game" hidden>
+            <p class="browse-summary">Keep the circle going by naming something new in the chosen category.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>3+ players</dd></div><div><dt>Bring</dt><dd>No equipment</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Categories">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Choose a category such as animals, foods, movies, or things you bring camping.</li><li>Go around the circle naming one new example each. Give each player a few seconds to think.</li><li>If someone repeats an answer or gets stuck, choose a new category and let that player start.</li></ol></div>
+            </details>
+          </article>
+          <article class="browse-card">
+            <div class="browse-card-top"><span class="browse-icon" aria-hidden="true">👂</span><span class="browse-number" aria-hidden="true">15</span></div>
             <h3>Guess the Sound</h3>
-            <p>One player makes a simple sound using nearby safe objects. Everyone else tries to identify what made it.</p>
-            <span>Funny with groups</span>
+            <p class="browse-summary">Listen closely and guess what made a mystery sound.</p>
+            <dl class="browse-facts"><div><dt>Players</dt><dd>3+ players</dd></div><div><dt>Bring</dt><dd>Safe everyday objects</dd></div></dl>
+            <details class="browse-details">
+              <summary aria-label="Read more about Guess the Sound">Read more <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></summary>
+              <div class="browse-details-body"><h4>How to play</h4><ol><li>Gather a few harmless objects, such as a zipper, water bottle, or crinkly wrapper.</li><li>One person makes a sound out of sight. Everyone else takes a guess.</li><li>Reveal the object and switch sound-makers. Keep the sounds quiet enough for nearby campers.</li></ol></div>
+            </details>
+          </article>
           </div>
-        </div>
-
-        <div class="games-more-wrap">
-          <button
-            class="btn secondary"
-            type="button"
-            id="toggleGamesBtn"
-            aria-expanded="false"
-          >
-            Show 6 More Games
-          </button>
         </div>
       </div>
     </section>
@@ -726,9 +837,15 @@
       <div class="excel-import-actions"><button class="btn secondary" id="backupBeforeExcelImport" type="button">Export current checklist</button><button class="btn secondary" id="cancelExcelImport" type="button">Cancel</button><button class="btn primary" id="applyExcelImport" type="button" disabled>Import items</button></div>
     </div>
   </div>
-  <script src="script.js?v=54" integrity="sha384-V6DdzczHAt+QzbYLOYodPUQsAIAtDOXMwmie4JRsvUb22P4cZvD7LFNxKQUZZdjh"></script>
+  <dialog class="camp-card-dialog" id="campCardDialog" aria-labelledby="campCardTitle">
+    <button class="card-dialog-close" type="button" aria-label="Close details" autofocus>×</button>
+    <div id="campCardContent"></div>
+    <button class="btn primary card-dialog-done" type="button">Back to cards</button>
+  </dialog>
+  <script src="script.js?v=58" integrity="sha384-9Nyc737vWLHpih27CGLLdK3RFUoZIABe7eABZzfdDdnGAvxhBw8nSp29G7hW3ZxE"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
   <script src="excel.js?v=57" integrity="sha384-5B7SvqcveP23NOjcqsA+f8dh7Hgh6fH40VVQcqoo95h6njKjVWfrKQnY3cMRIXm0"></script>
   <script src="hero-photos.js" integrity="sha384-zz3sL/JWPk6KTCzZInkL+mpV3ghQQiBfMak19hh/K17W1w2WC0DvhuNTGqr+muZe"></script>
+  <script src="card-browser.js?v=58" integrity="sha384-9APkB2bqVAIeEFAO+2x1mAtsfzblf/p9iCuA8NsaLazQKaWRJ6Txfg+nH2PQn/5j"></script>
 </body>
 </html>

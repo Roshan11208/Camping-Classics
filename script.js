@@ -2514,26 +2514,6 @@ if (useLocationBtn && finderStatus) {
 }
 
 
-const toggleGamesBtn = document.getElementById("toggleGamesBtn");
-const extraGames = [...document.querySelectorAll(".extra-game")];
-
-if (toggleGamesBtn && extraGames.length > 0) {
-  toggleGamesBtn.addEventListener("click", () => {
-    const isExpanded = toggleGamesBtn.getAttribute("aria-expanded") === "true";
-    const newExpanded = !isExpanded;
-
-    extraGames.forEach((card) => {
-      card.hidden = !newExpanded;
-    });
-
-    toggleGamesBtn.setAttribute("aria-expanded", String(newExpanded));
-    toggleGamesBtn.textContent = newExpanded
-      ? "Show Fewer Games"
-      : "Show 6 More Games";
-    trackEvent(newExpanded ? "games_expand" : "games_collapse");
-  });
-}
-
 document.getElementById("year").textContent = new Date().getFullYear();
 
 
