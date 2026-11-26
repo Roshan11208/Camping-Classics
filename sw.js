@@ -1,4 +1,4 @@
-const CACHE_NAME = "camping-classics-consent-20261126";
+const CACHE_NAME = "camping-classics-trackpad-20261126";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -13,7 +13,7 @@ const CORE_ASSETS = [
   "./hero-photos.js?v=consent-20261126",
   "./card-browser.css?v=58",
   "./card-browser.js?v=58",
-  "./script.js?v=consent-20261126",
+  "./script.js?v=trackpad-20261126",
   "./manifest.webmanifest",
   "./privacy.js?v=consent-20261126",
   "./excel.js?v=57",

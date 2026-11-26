@@ -2361,7 +2361,7 @@ function renderCampList(camps, label) {
   campCount.textContent = `${visibleCamps.length} result${visibleCamps.length === 1 ? "" : "s"}`;
 
   campList.innerHTML = visibleCamps.map((camp, index) => {
-    const mapsQuery = `${camp.lat},${camp.lon}`;
+    const mapsQuery = /^Unnamed /.test(camp.name) ? [camp.lat, camp.lon].join(",") : [camp.name, camp.address || [camp.lat, camp.lon].join(", ")].join(", ");
     const mapsUrl =
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery)}`;
 
@@ -2405,7 +2405,7 @@ function renderCampList(camps, label) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Open in Google Maps
+            View on Google Maps for ratings
           </a>
         </div>
       </article>
@@ -2422,7 +2422,29 @@ const areaButton = document.getElementById("searchMapArea");
 function openCampMap() {
   if (campMap || !window.L) return campMap;
   document.getElementById("openCampMap").remove();
-  campMap = L.map("campMap", {scrollWheelZoom: false}).setView([38, -97], 4);
+  campMap = L.map("campMap", {scrollWheelZoom: true, zoomSnap: 0.25}).setView([38, -97], 4);
+  const surface = campMap.getContainer();
+  // Pixel-based two-finger scrolls pan. Pinch (Ctrl+wheel) and wheel notches zoom.
+  surface.addEventListener("wheel", event => {
+    if (event.ctrlKey || event.metaKey || event.deltaMode !== 0 ||
+        (!event.deltaX && Math.abs(event.deltaY) >= 100 && event.deltaY % 50 === 0)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    campMap.panBy([event.deltaX, event.deltaY], {animate: false});
+  }, {capture: true, passive: false});
+  // Safari can expose trackpad pinches as gesture events.
+  let gestureZoom;
+  surface.addEventListener("gesturestart", event => {
+    event.preventDefault();
+    gestureZoom = campMap.getZoom();
+  }, {passive: false});
+  surface.addEventListener("gesturechange", event => {
+    event.preventDefault();
+    if (gestureZoom !== undefined && event.scale > 0) {
+      campMap.setZoom(gestureZoom + Math.log2(event.scale), {animate: false});
+    }
+  }, {passive: false});
+  surface.addEventListener("gestureend", () => { gestureZoom = undefined; });
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -2449,7 +2471,15 @@ function plotCampgrounds(camps) {
     directions.target = "_blank";
     directions.rel = "noopener noreferrer";
     detail.append(name, document.createElement("br"), camp.distance.toFixed(1) + " mi from search center", document.createElement("br"), directions);
-    L.marker([camp.lat, camp.lon], {icon, title: camp.name, alt: camp.name}).bindPopup(detail).addTo(campPins);
+    const preview = document.createElement("div");
+    preview.append(name.cloneNode(true), document.createElement("br"),
+      camp.typeLabel + " · " + camp.distance.toFixed(1) + " mi away");
+    if (camp.address) preview.append(document.createElement("br"), camp.address);
+    const marker = L.marker([camp.lat, camp.lon], {icon, alt: camp.name})
+      .bindPopup(detail)
+      .bindTooltip(preview, {direction: "auto", opacity: 1})
+      .addTo(campPins);
+    marker.getElement().setAttribute("aria-label", camp.name);
   }
   if (camps.length) campMap.fitBounds(camps.map(camp => [camp.lat, camp.lon]), {padding: [20, 20], maxZoom: 12});
 }
