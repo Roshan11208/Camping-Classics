@@ -2402,12 +2402,12 @@ function renderCampList(camps, label) {
           <a
             class="btn secondary camp-map-btn"
             href="${mapsUrl}"
-            aria-label="Read Google reviews for ${escapeHtml(camp.name)} (opens in a new tab)"
+            aria-label="Read reviews for ${escapeHtml(camp.name)} (opens in a new tab)"
             title="Read reviews on Google Maps"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span aria-hidden="true">☆☆☆☆☆</span>
+            Read reviews
           </a>
         </div>
       </article>
