@@ -6,7 +6,7 @@
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
   <link rel="stylesheet" href="vendor/leaflet.css" />
-  <link rel="stylesheet" href="styles.css?v=map-20261126" />
+  <link rel="stylesheet" href="styles.css?v=consent-20261126" />
   <link rel="stylesheet" href="card-browser.css?v=58" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
@@ -652,24 +652,7 @@
     <button class="btn secondary" type="button" id="cookiesNo">Deny cookies</button>
     <button class="btn primary" type="button" id="cookiesYes">Allow cookies</button>
   </aside>
-  <dialog id="privacyAgeDialog" class="privacy-dialog" aria-labelledby="privacyAgeTitle" aria-describedby="privacyAgeDescription">
-    <p class="eyebrow">Your privacy</p>
-    <h2 id="privacyAgeTitle">A quick privacy check</h2>
-    <p id="privacyAgeDescription">Choose your age group to set your privacy options. This choice stays in this browser tab. We do not ask for your birthday.</p>
-    <form id="privacyAgeForm">
-      <label for="privacyAgeOptions">Your age group</label>
-      <select id="privacyAgeOptions" required>
-        <option value="">Choose an age group</option>
-        <option value="under13">Under 13</option>
-        <option value="13to15">13–15</option>
-        <option value="16plus">16 or older</option>
-      </select>
-      <button type="submit" class="btn primary">Continue</button>
-    </form>
-    <p id="privacyAgeMessage" hidden>Your planner, checklist, guides and games are ready to use. Optional analytics stays off. Ask an adult to handle feedback for you.</p>
-    <button type="button" id="privacyAgeClose" class="btn secondary">Not now</button>
-    <p class="privacy-small"><a href="privacy.html#children">How we protect younger visitors</a></p>
-  </dialog>
+
 
 
   <button class="feedback-fab" id="feedbackButton" type="button">
@@ -858,12 +841,12 @@
     <div id="campCardContent"></div>
     <button class="btn primary card-dialog-done" type="button">Back to cards</button>
   </dialog>
-  <script src="privacy.js?v=map-20261126" integrity="sha384-3KUkn0vTlE9iUdzrjE5CzjOg+6peNX7cwhDo8lbYKN8Az2GOAySJ20UuEEOG12Wm"></script>
+  <script src="privacy.js?v=consent-20261126" integrity="sha384-TliTcscqkenq2PVJVkU8zQWhU8Q2kJabYACU/A1aEyxE69AWe+BG/js9Jr8lJPZT"></script>
   <script src="vendor/leaflet.min.js" integrity="sha384-n+BTYiUcIQX4oNbtEyUQXKW23Ht2vgq99XIkT/6rnj1YY+dd0zrWFE5faeudmoll"></script>
-  <script src="script.js?v=map-20261126" integrity="sha384-jjZCNctuqZGv4goQHen7WEfWtGvjvhI7Zz6NpCEe8kMdAyUGKbF4dHDIxgH0rw70"></script>
+  <script src="script.js?v=consent-20261126" integrity="sha384-FMXB9f8o2WBuXHXAe4FJ2ZlP9JaT46YmEo234ETm9aWCdh91XmhleMkeOorIo3YM"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
   <script src="excel.js?v=57" integrity="sha384-5B7SvqcveP23NOjcqsA+f8dh7Hgh6fH40VVQcqoo95h6njKjVWfrKQnY3cMRIXm0"></script>
-  <script src="hero-photos.js?v=map-20261126" integrity="sha384-hOeYdmnxlT+uD8H9s1/f8mwhzp0brtG8g5QaauHmsoy6MTOMepWOikxpxbe9y5M5"></script>
+  <script src="hero-photos.js?v=consent-20261126" integrity="sha384-hOeYdmnxlT+uD8H9s1/f8mwhzp0brtG8g5QaauHmsoy6MTOMepWOikxpxbe9y5M5"></script>
   <script src="card-browser.js?v=58" integrity="sha384-9APkB2bqVAIeEFAO+2x1mAtsfzblf/p9iCuA8NsaLazQKaWRJ6Txfg+nH2PQn/5j"></script>
 </body>
 </html>

@@ -1884,8 +1884,7 @@ if (importSharedTrip) {
 });
 
 if (feedbackButton) {
-  feedbackButton.addEventListener("click", async () => {
-    if (!(await window.campingPrivacy?.requireOnlineAccess())) return;
+  feedbackButton.addEventListener("click", () => {
     feedbackStatus.textContent = "";
     openSiteModal(feedbackModal);
     trackEvent("feedback_open");
@@ -1917,7 +1916,6 @@ feedbackConfirmation.addEventListener("click", event => {
 if (feedbackForm) {
   feedbackForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!window.campingPrivacy?.canUseOnline()) return;
     const button = feedbackForm.querySelector('button[type="submit"]');
     if (button.disabled) return;
     const useful = new FormData(feedbackForm).get("feedbackUseful");
