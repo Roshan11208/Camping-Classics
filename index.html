@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
-  <link rel="stylesheet" href="styles.css?v=57" />
+  <link rel="stylesheet" href="styles.css?v=privacy-20261126" />
   <link rel="stylesheet" href="card-browser.css?v=58" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
@@ -45,11 +45,10 @@
           <p class="hero-copy">Plan the days. Pack the essentials. Make room for the good stuff.</p>
           <div class="hero-actions"><a class="btn primary" href="#planner">Plan a trip</a><a class="btn secondary" href="#saved-trips">My saved trips</a></div>
         </div>
-        <div class="hero-photo-wrap">
-          <div class="hero-slide"><img class="hero-photo" src="https://images.unsplash.com/photo-1760715650044-4e588c2dd2e2?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=75&w=1600" alt="Tent at a mountain campsite around sunrise" loading="eager"><a class="hero-photo-credit" href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
-          <div class="hero-slide" hidden><img class="hero-photo" src="https://www.oars.com/wp-content/uploads/2022/08/gsi_2017_campfire_03_f_web-1680x900.jpg" loading="eager" decoding="async" referrerpolicy="no-referrer" alt="Campfire at a campsite"><a class="hero-photo-credit" target="_blank" rel="noopener noreferrer" href="https://www.oars.com/blog/camping-tips-the-complete-guide/">OARS</a></div>
-          <div class="hero-slide" hidden><img class="hero-photo" src="https://educationalrenaissance.com/wp-content/uploads/2025/11/Camping.png" loading="eager" decoding="async" referrerpolicy="no-referrer" alt="Outdoor camping scene"><a class="hero-photo-credit" target="_blank" rel="noopener noreferrer" href="https://educationalrenaissance.com/2025/11/29/on-the-benefits-of-camping/">Educational Renaissance</a></div>
-          <button type="button" id="heroRotation" hidden>Pause photos</button>
+        <div class="hero-photo-wrap" aria-label="Camping photographs">
+          <div class="hero-slide"><img class="hero-photo" src="assets/camp-sunrise.jpg" width="1280" height="853" alt="A tent and mountain peaks at sunrise" fetchpriority="high" decoding="async"><a class="hero-photo-credit" href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
+          <div class="hero-slide" hidden><img class="hero-photo photo-forest" data-src="assets/camp-forest.jpg" width="1280" height="853" decoding="async" alt="A small tent in a forest below the Sawtooth Mountains"><a class="hero-photo-credit" href="https://unsplash.com/photos/a-tent-in-the-middle-of-a-forest-with-mountains-in-the-background-M0uARb6QWP4" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
+          <div class="hero-slide" hidden><img class="hero-photo photo-night" data-src="assets/camp-night.jpg" width="1280" height="853" decoding="async" alt="A mountain campsite beneath a star-filled night sky"><a class="hero-photo-credit" href="https://unsplash.com/photos/a-tent-pitched-up-on-top-of-a-mountain-under-a-night-sky-filled-with-stars-MZfMrdBWmsU" target="_blank" rel="noopener noreferrer">Luke Miller / Unsplash</a></div>
         </div>
       </div>
     </section>
@@ -558,7 +557,7 @@
           <div class="finder-main">
             <div class="finder-icon" aria-hidden="true">🏕️</div>
             <h3>Where do you want to camp?</h3>
-            <p>Your location is used only for this search and is not saved by Camping Classics.</p>
+            <p>Searches send your city, ZIP code or location-based search area to campground data services. Camping Classics does not save your search location. <a class="privacy-inline" href="privacy.html#location">Location privacy</a>.</p>
 
             <div class="finder-actions">
               <button class="btn primary" type="button" id="useLocationBtn">Use My Location</button>
@@ -576,7 +575,7 @@
               </form>
             </div>
 
-            <p class="finder-country-note">Camp Finder currently supports U.S. locations.</p>
+            <p class="finder-country-note">Camp Finder supports U.S. locations. Online searches are available after the privacy check for visitors aged 16 or older.</p>
 
             <p class="finder-status" id="finderStatus" aria-live="polite">
               Search for a location to see nearby campgrounds.
@@ -645,17 +644,36 @@
       <div class="footer-base">
         <p>© <span id="year"></span> Camping Classics</p>
         <p>Built for beginner campers.</p>
+        <nav class="legal-links" aria-label="Website policies"><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of use</a></nav>
         <button type="button" id="cookiesOpen">Cookie settings</button>
       </div>
     </div>
   </footer>
   <aside id="cookiesPanel" hidden aria-label="Analytics cookie settings">
     <strong>Help improve Camping Classics?</strong>
-    <p>Optional Google Analytics cookies help us understand which features campers use. Your planner works either way. A preference cookie remembers your choice for six months.</p>
+    <p>Optional Google Analytics cookies help us understand how the site is used. Your planner works either way. We remember your cookie choice for six months. <a href="privacy.html#cookies">Read our privacy policy</a>.</p>
+    <p id="cookiePrivacyStatus" role="status"></p>
     <button class="btn secondary" type="button" id="cookiesNo">Deny cookies</button>
-    <button class="btn secondary" type="button" id="cookiesYes">Allow cookies</button>
+    <button class="btn primary" type="button" id="cookiesYes">Allow cookies</button>
   </aside>
-  <script defer src="privacy.js" integrity="sha384-ouV7c1yzV8VErQbLkL+t7nYtB6LRSO2kqC7WdknJYRZWSKYNDgkQ6B+Ig+uNfLEm"></script>
+  <dialog id="privacyAgeDialog" class="privacy-dialog" aria-labelledby="privacyAgeTitle" aria-describedby="privacyAgeDescription">
+    <p class="eyebrow">Your privacy</p>
+    <h2 id="privacyAgeTitle">A quick privacy check</h2>
+    <p id="privacyAgeDescription">Choose your age group to set your privacy options. This choice stays in this browser tab. We do not ask for your birthday.</p>
+    <form id="privacyAgeForm">
+      <label for="privacyAgeOptions">Your age group</label>
+      <select id="privacyAgeOptions" required>
+        <option value="">Choose an age group</option>
+        <option value="under13">Under 13</option>
+        <option value="13to15">13–15</option>
+        <option value="16plus">16 or older</option>
+      </select>
+      <button type="submit" class="btn primary">Continue</button>
+    </form>
+    <p id="privacyAgeMessage" hidden>Your planner, checklist, guides and games are ready to use. Optional analytics stays off. Ask an adult to handle feedback and online campground searches for you.</p>
+    <button type="button" id="privacyAgeClose" class="btn secondary">Not now</button>
+    <p class="privacy-small"><a href="privacy.html#children">How we protect younger visitors</a></p>
+  </dialog>
 
 
   <button class="feedback-fab" id="feedbackButton" type="button">
@@ -682,7 +700,7 @@
       <button class="modal-close" id="closeFeedbackModal" type="button" aria-label="Close feedback">×</button>
       <p class="eyebrow">Feedback</p>
       <h2 id="feedbackTitle">Help improve Camping Classics</h2>
-      <p class="modal-copy">A couple of quick answers are enough. No account or personal information is required.</p>
+      <p class="modal-copy">A couple of quick answers are enough. Please leave out names, contact details, exact locations and other personal information.</p>
 
       <form id="feedbackForm" data-endpoint="https://formspree.io/f/mnpdpaqn" class="feedback-form">
         <fieldset>
@@ -727,6 +745,8 @@
           </div>
         </label>
 
+        <p class="privacy-small">Your answers are sent to Camping Classics through Formspree, which also receives connection information such as your IP address. <a href="privacy.html#feedback">How feedback is handled</a>.</p>
+        <label class="feedback-consent"><input type="checkbox" id="feedbackConsent" required> <span>I agree to send these answers through Formspree.</span></label>
         <button class="btn primary" type="submit">Send Feedback</button>
         <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
       </form>
@@ -842,10 +862,11 @@
     <div id="campCardContent"></div>
     <button class="btn primary card-dialog-done" type="button">Back to cards</button>
   </dialog>
-  <script src="script.js?v=58" integrity="sha384-9Nyc737vWLHpih27CGLLdK3RFUoZIABe7eABZzfdDdnGAvxhBw8nSp29G7hW3ZxE"></script>
+  <script src="privacy.js?v=privacy-20261126" integrity="sha384-3KUkn0vTlE9iUdzrjE5CzjOg+6peNX7cwhDo8lbYKN8Az2GOAySJ20UuEEOG12Wm"></script>
+  <script src="script.js?v=privacy-20261126" integrity="sha384-adRid4NbNlahmy4Wf3C2X7jSmtYMYBK7dzIlxxnk/+6CU+1/oylfO4uQc9As8t0f"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
   <script src="excel.js?v=57" integrity="sha384-5B7SvqcveP23NOjcqsA+f8dh7Hgh6fH40VVQcqoo95h6njKjVWfrKQnY3cMRIXm0"></script>
-  <script src="hero-photos.js" integrity="sha384-zz3sL/JWPk6KTCzZInkL+mpV3ghQQiBfMak19hh/K17W1w2WC0DvhuNTGqr+muZe"></script>
+  <script src="hero-photos.js?v=privacy-20261126" integrity="sha384-i4OAVgSrmMONudee0k5rUSP0HwiTgL2udcMg8zMda4zCb2KEmAS6uJZ0Hq++89tt"></script>
   <script src="card-browser.js?v=58" integrity="sha384-9APkB2bqVAIeEFAO+2x1mAtsfzblf/p9iCuA8NsaLazQKaWRJ6Txfg+nH2PQn/5j"></script>
 </body>
 </html>

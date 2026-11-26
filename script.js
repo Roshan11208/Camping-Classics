@@ -72,6 +72,7 @@ function escapeChecklistText(value) {
 }
 
 function clampQuantity(value) {
+  if (typeof value !== "number" && typeof value !== "string") return 0;
   const parsed = Number.parseInt(value, 10);
   if (!Number.isFinite(parsed)) return 0;
   return Math.min(99, Math.max(0, parsed));
@@ -118,22 +119,25 @@ function cloneData(value) {
 }
 
 function normalizeChecklist(checklist) {
-  const normalized = {};
+  const normalized = Object.create(null);
 
-  if (!checklist || typeof checklist !== "object") {
+  if (!checklist || typeof checklist !== "object" || Array.isArray(checklist)) {
     return cloneData(defaultChecklist);
   }
 
-  Object.entries(checklist).forEach(([category, items]) => {
-    if (!Array.isArray(items)) return;
+  let remaining = 1000;
+  Object.entries(checklist).slice(0, 24).forEach(([category, items]) => {
+    if (!Array.isArray(items) || ["__proto__", "constructor", "prototype"].includes(category)) return;
 
-    normalized[category] = items.map((item) => {
+    const validItems = items.filter(item => typeof item === "string" || (item && typeof item === "object" && !Array.isArray(item))).slice(0, remaining);
+    remaining -= validItems.length;
+    normalized[category.slice(0, 80)] = validItems.map((item) => {
       if (typeof item === "string") {
-        return createChecklistItem(item);
+        return createChecklistItem(item.slice(0, 160));
       }
 
       return createChecklistItem(
-        item.label ?? item.name ?? "Checklist item",
+        typeof item.label === "string" ? item.label.slice(0, 160) : typeof item.name === "string" ? item.name.slice(0, 160) : "Checklist item",
         item.quantity ?? 0,
         item.checked ?? false,
         item.custom ?? false
@@ -161,7 +165,7 @@ function loadCurrentChecklist() {
 function loadCurrentPlanner() {
   try {
     const saved = localStorage.getItem(CURRENT_PLANNER_KEY);
-    return saved ? JSON.parse(saved) : null;
+    return saved ? normalizePlannerSettings(JSON.parse(saved)) : null;
   } catch {
     return null;
   }
@@ -683,6 +687,40 @@ function buildStartingChecklist(settings) {
     [category, items.map(item => createChecklistItem(item.label, 0, false, false))]));
 }
 
+// Shared links, backups and browser storage are untrusted input. Keep only
+// known fields and bounded values before they reach any renderer or form.
+function normalizePlannerSettings(raw) {
+  const value = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  const integer = (input, maximum, fallback) => {
+    if (!["number", "string"].includes(typeof input) || String(input).trim() === "") return fallback;
+    const number = Number(input);
+    return Number.isFinite(number) ? Math.min(maximum, Math.max(1, Math.trunc(number))) : fallback;
+  };
+  const date = input => {
+    if (typeof input !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(input)) return "";
+    const parsed = new Date(input + "T00:00:00Z");
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === input ? input : "";
+  };
+  const startDate = date(value.startDate);
+  let endDate = date(value.endDate);
+  let days = integer(value.days, 30, 2);
+  if (startDate && endDate && endDate >= startDate) {
+    days = Math.min(30, Math.floor((Date.parse(endDate) - Date.parse(startDate)) / 86400000) + 1);
+    endDate = new Date(Date.parse(startDate) + (days - 1) * 86400000).toISOString().slice(0, 10);
+  } else if (endDate) {
+    endDate = "";
+  }
+  return {
+    tripName: typeof value.tripName === "string" ? value.tripName.slice(0, 120) : "",
+    campers: integer(value.campers, 20, 2), days, startDate, endDate,
+    campType: ["tent", "cabin", "rv"].includes(value.campType) ? value.campType : "tent",
+    weather: ["mild", "hot", "cold", "rain"].includes(value.weather) ? value.weather : "mild",
+    activities: ["hiking", "fishing", "swimming"].filter(activity => Array.isArray(value.activities) && value.activities.includes(activity)),
+    withKids: value.withKids === true, withPet: value.withPet === true,
+    cookAtCamp: value.cookAtCamp === true, noWater: value.noWater === true
+  };
+}
+
 function collectPlannerSettings() {
   return {
     tripName: document.getElementById("tripName").value.trim(),
@@ -919,7 +957,7 @@ function updateTripSummary() {
 
   tripSummaryName.textContent = name;
   tripSummaryDetails.innerHTML = `
-    <span>${settings.campers || "?"} camper${settings.campers === 1 ? "" : "s"}</span>
+    <span>${escapeChecklistText(settings.campers || "?")} camper${settings.campers === 1 ? "" : "s"}</span>
     <span>${escapeChecklistText(tripDateLabel(settings))}</span>
     <span>${escapeChecklistText(campTypeLabel(settings.campType))}</span>
     <span>${escapeChecklistText(activityText)}</span>
@@ -1209,7 +1247,18 @@ resetChecklist.addEventListener("click", () => {
 function loadSavedTrips() {
   try {
     const saved = localStorage.getItem(SAVED_TRIPS_KEY);
-    return saved ? JSON.parse(saved) : [];
+    const raw = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(trip => trip && typeof trip === "object" && typeof trip.id === "string").map(trip => ({
+      id: trip.id.slice(0, 160),
+      name: typeof trip.name === "string" ? trip.name.slice(0, 120) : "Camping Trip",
+      planner: normalizePlannerSettings(trip.planner),
+      checklist: normalizeChecklist(trip.checklist),
+      dayPlans: normalizeDayPlans(trip.dayPlans, normalizePlannerSettings(trip.planner).days),
+      archived: trip.archived === true,
+      createdAt: Number.isFinite(trip.createdAt) ? trip.createdAt : 0,
+      updatedAt: Number.isFinite(trip.updatedAt) ? trip.updatedAt : 0
+    }));
   } catch {
     return [];
   }
@@ -1270,6 +1319,9 @@ function encodeSharePayload(value) {
 }
 
 function decodeSharePayload(value) {
+  if (typeof value !== "string" || value.length > 100000 || !/^[A-Za-z0-9_-]+$/.test(value)) {
+    throw new Error("Invalid shared trip");
+  }
   const padded = value
     .replaceAll("-", "+")
     .replaceAll("_", "/")
@@ -1398,12 +1450,12 @@ if (shareTripModal) {
 let pendingSharedTrip = null;
 
 function showSharedTripImport(payload) {
-  if (!payload || typeof payload !== "object") return;
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return;
 
   const checklist = normalizeChecklist(payload.checklist || {});
-  const settings = payload.planner || {};
+  const settings = normalizePlannerSettings(payload.planner);
   const stats = checklistProgressStats(checklist);
-  const name = String(payload.name || settings.tripName || "Shared Camping Trip").slice(0, 120);
+  const name = (typeof payload.name === "string" && payload.name.trim() ? payload.name : settings.tripName || "Shared Camping Trip").slice(0, 120);
 
   pendingSharedTrip = {
     name,
@@ -1417,18 +1469,19 @@ function showSharedTripImport(payload) {
 
   sharedTripTitle.textContent = name;
   sharedTripDescription.textContent = "Someone shared this Camping Classics trip with you.";
-  sharedTripPreview.innerHTML = `
-    <div class="shared-trip-preview-icon" aria-hidden="true">${tripTypeIcon(settings.campType)}</div>
-    <div>
-      <strong>${escapeChecklistText(name)}</strong>
-      <p>
-        ${settings.campers || "?"} camper${settings.campers === 1 ? "" : "s"}
-        · ${escapeChecklistText(tripDateLabel(settings))}
-        · ${escapeChecklistText(campTypeLabel(settings.campType))}
-      </p>
-      <span>${stats.checked} of ${stats.total} packed</span>
-    </div>
-  `;
+  const icon = document.createElement("div");
+  icon.className = "shared-trip-preview-icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = tripTypeIcon(settings.campType);
+  const details = document.createElement("div");
+  const title = document.createElement("strong");
+  title.textContent = name;
+  const description = document.createElement("p");
+  description.textContent = `${settings.campers} camper${settings.campers === 1 ? "" : "s"} · ${tripDateLabel(settings)} · ${campTypeLabel(settings.campType)}`;
+  const progress = document.createElement("span");
+  progress.textContent = `${stats.checked} of ${stats.total} packed`;
+  details.append(title, description, progress);
+  sharedTripPreview.replaceChildren(icon, details);
 
   openSiteModal(sharedTripModal);
 }
@@ -1496,7 +1549,7 @@ function renderSavedTrips() {
         </div>
 
         <div class="saved-trip-detail-chips">
-          <span>${settings.campers || "?"} camper${settings.campers === 1 ? "" : "s"}</span>
+          <span>${escapeChecklistText(settings.campers || "?")} camper${settings.campers === 1 ? "" : "s"}</span>
           <span>${escapeChecklistText(tripDateLabel(settings))}</span>
           <span>${escapeChecklistText(campTypeLabel(settings.campType))}</span>
         </div>
@@ -1511,21 +1564,21 @@ function renderSavedTrips() {
         </div>
 
         <div class="saved-trip-actions">
-          <button class="btn primary open-saved-trip" type="button" data-trip-id="${trip.id}">Open Trip</button>
-          <button class="btn secondary share-saved-trip" type="button" data-trip-id="${trip.id}">Share</button>
-          <button class="btn secondary duplicate-saved-trip" type="button" data-trip-id="${trip.id}">Duplicate</button>
-          <button class="btn secondary rename-saved-trip" type="button" data-trip-id="${trip.id}">Rename</button>
+          <button class="btn primary open-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Open Trip</button>
+          <button class="btn secondary share-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Share</button>
+          <button class="btn secondary duplicate-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Duplicate</button>
+          <button class="btn secondary rename-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Rename</button>
           ${
             archived
-              ? `<button class="btn secondary restore-saved-trip" type="button" data-trip-id="${trip.id}">Restore</button>`
+              ? `<button class="btn secondary restore-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Restore</button>`
               : canArchive
-                ? `<button class="btn secondary archive-saved-trip" type="button" data-trip-id="${trip.id}">Archive</button>`
+                ? `<button class="btn secondary archive-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Archive</button>`
                 : ""
           }
-          <button class="btn secondary delete-saved-trip" type="button" data-trip-id="${trip.id}">Delete</button>
+          <button class="btn secondary delete-saved-trip" type="button" data-trip-id="${escapeChecklistText(trip.id)}">Delete</button>
         </div>
 
-        <p class="saved-trip-action-status" data-status-for="${trip.id}" aria-live="polite"></p>
+        <p class="saved-trip-action-status" data-status-for="${escapeChecklistText(trip.id)}" aria-live="polite"></p>
       </article>
     `;
   };
@@ -1831,7 +1884,8 @@ if (importSharedTrip) {
 });
 
 if (feedbackButton) {
-  feedbackButton.addEventListener("click", () => {
+  feedbackButton.addEventListener("click", async () => {
+    if (!(await window.campingPrivacy?.requireOnlineAccess())) return;
     feedbackStatus.textContent = "";
     openSiteModal(feedbackModal);
     trackEvent("feedback_open");
@@ -1863,12 +1917,13 @@ feedbackConfirmation.addEventListener("click", event => {
 if (feedbackForm) {
   feedbackForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!window.campingPrivacy?.canUseOnline()) return;
     const button = feedbackForm.querySelector('button[type="submit"]');
     if (button.disabled) return;
     const useful = new FormData(feedbackForm).get("feedbackUseful");
     const area = feedbackArea.value;
     const comment = feedbackComment.value.trim();
-    if (!useful || !area) return;
+    if (!["yes", "not_yet"].includes(useful) || !["trip_planner", "checklist", "saved_trips", "camp_finder", "guides", "games", "other"].includes(area) || comment.length > 30 || !feedbackForm.reportValidity()) return;
     const endpoint = feedbackForm.dataset.endpoint;
     if (!endpoint) {
       const link = document.createElement("a");
@@ -2364,6 +2419,7 @@ function renderCampList(camps, label) {
 }
 
 async function findNearbyCamps(lat, lon, label, waitBeforeSearch = false) {
+  if (!window.campingPrivacy?.canUseOnline()) return;
   lastCampSearch = { lat, lon, label, waitBeforeSearch };
   trackEvent("camp_search");
   showCampResults.hidden = true;
@@ -2457,6 +2513,7 @@ if (campSearchForm && campSearchInput && finderStatus) {
   });
   campSearchForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!(await window.campingPrivacy?.requireOnlineAccess())) return;
 
     const locationText = campSearchInput.value.trim();
 
@@ -2482,7 +2539,8 @@ if (campSearchForm && campSearchInput && finderStatus) {
 }
 
 if (useLocationBtn && finderStatus) {
-  useLocationBtn.addEventListener("click", () => {
+  useLocationBtn.addEventListener("click", async () => {
+    if (!(await window.campingPrivacy?.requireOnlineAccess())) return;
     if (!("geolocation" in navigator)) {
       finderStatus.textContent =
         "Location access is not supported in this browser. Try the city or ZIP search instead.";
