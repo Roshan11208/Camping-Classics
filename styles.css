@@ -2820,3 +2820,14 @@ h2 {font-size:clamp(1.6rem,3vw,2rem);letter-spacing:-.04em;line-height:1.25}
 .policy-page .footer-base {margin:0;padding:0;border:0}
 .policy-page .footer-base p {color:inherit}
 @media(max-width:520px){.policy-header .brand{font-size:1rem}.policy-header .btn{padding:.5rem .7rem;font-size:.85rem}.policy-article{border-radius:14px}.privacy-dialog{padding:22px}.footer-base #cookiesOpen{margin:0}}
+
+#nextHeroPhoto {position:absolute;inset:0;z-index:1;width:100%;border:0;background:transparent;cursor:pointer}
+#nextHeroPhoto:focus-visible {outline:4px solid white;outline-offset:-6px}
+.hero-photo-credit {z-index:2}
+.finder-map {min-width:0;display:grid;align-content:start;gap:.65rem}
+.finder-map h3 {margin:0}
+#campMap {height:320px;border-radius:14px;background:#e6eee7;isolation:isolate}
+#campMap:not(.leaflet-container) {display:grid;place-items:center}
+#searchMapArea {justify-self:start}
+.camp-pin {border-radius:50%;background:#176344;border:2px solid white;box-shadow:0 0 0 1px #174f3b}
+@media(max-width:600px){#campMap{height:265px}}

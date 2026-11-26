@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Camping Classics</title>
   <meta name="description" content="A beginner-friendly camping planner with packing lists, guides, games, and trip planning tools." />
-  <link rel="stylesheet" href="styles.css?v=privacy-20261126" />
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="styles.css?v=map-20261126" />
   <link rel="stylesheet" href="card-browser.css?v=58" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#163e32" />
@@ -46,6 +47,7 @@
           <div class="hero-actions"><a class="btn primary" href="#planner">Plan a trip</a><a class="btn secondary" href="#saved-trips">My saved trips</a></div>
         </div>
         <div class="hero-photo-wrap" aria-label="Camping photographs">
+          <button id="nextHeroPhoto" type="button" aria-label="Show next camping photo"></button>
           <div class="hero-slide"><img class="hero-photo" src="assets/camp-sunrise.jpg" width="1280" height="853" alt="A tent and mountain peaks at sunrise" fetchpriority="high" decoding="async"><a class="hero-photo-credit" href="https://unsplash.com/photos/tent-setup-at-sunrise-with-mountain-backdrop-x9ADJTA_aIc" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
           <div class="hero-slide" hidden><img class="hero-photo photo-forest" data-src="assets/camp-forest.jpg" width="1280" height="853" decoding="async" alt="A small tent in a forest below the Sawtooth Mountains"><a class="hero-photo-credit" href="https://unsplash.com/photos/a-tent-in-the-middle-of-a-forest-with-mountains-in-the-background-M0uARb6QWP4" target="_blank" rel="noopener noreferrer">Alex Moliski / Unsplash</a></div>
           <div class="hero-slide" hidden><img class="hero-photo photo-night" data-src="assets/camp-night.jpg" width="1280" height="853" decoding="async" alt="A mountain campsite beneath a star-filled night sky"><a class="hero-photo-credit" href="https://unsplash.com/photos/a-tent-pitched-up-on-top-of-a-mountain-under-a-night-sky-filled-with-stars-MZfMrdBWmsU" target="_blank" rel="noopener noreferrer">Luke Miller / Unsplash</a></div>
@@ -575,24 +577,18 @@
               </form>
             </div>
 
-            <p class="finder-country-note">Camp Finder supports U.S. locations. Online searches are available after the privacy check for visitors aged 16 or older.</p>
+            <p class="finder-country-note">Camp Finder supports U.S. locations.</p>
 
             <p class="finder-status" id="finderStatus" aria-live="polite">
               Search for a location to see nearby campgrounds.
             </p>
           </div>
 
-          <div class="finder-tips">
-            <h3>What to check before booking</h3>
-            <ul>
-              <li>Whether reservations are required</li>
-              <li>Restrooms and drinking water availability</li>
-              <li>Fire and cooking rules</li>
-              <li>Quiet hours and campground rules</li>
-              <li>Weather and seasonal closures</li>
-              <li>Pet rules, if you are bringing one</li>
-            </ul>
-          </div>
+          <section class="finder-map" aria-labelledby="mapHeading">
+            <h3 id="mapHeading">Campground map</h3>
+            <div id="campMap" aria-label="Interactive campground map"><button type="button" class="btn secondary" id="openCampMap">Explore the map</button></div>
+            <button type="button" class="btn secondary" id="searchMapArea" hidden>Search this area</button>
+          </section>
         </div>
 
         <button id="showCampResults" class="btn secondary" type="button" aria-controls="campResults" aria-expanded="false" hidden>Show campsite results</button>
@@ -670,7 +666,7 @@
       </select>
       <button type="submit" class="btn primary">Continue</button>
     </form>
-    <p id="privacyAgeMessage" hidden>Your planner, checklist, guides and games are ready to use. Optional analytics stays off. Ask an adult to handle feedback and online campground searches for you.</p>
+    <p id="privacyAgeMessage" hidden>Your planner, checklist, guides and games are ready to use. Optional analytics stays off. Ask an adult to handle feedback for you.</p>
     <button type="button" id="privacyAgeClose" class="btn secondary">Not now</button>
     <p class="privacy-small"><a href="privacy.html#children">How we protect younger visitors</a></p>
   </dialog>
@@ -862,11 +858,12 @@
     <div id="campCardContent"></div>
     <button class="btn primary card-dialog-done" type="button">Back to cards</button>
   </dialog>
-  <script src="privacy.js?v=privacy-20261126" integrity="sha384-3KUkn0vTlE9iUdzrjE5CzjOg+6peNX7cwhDo8lbYKN8Az2GOAySJ20UuEEOG12Wm"></script>
-  <script src="script.js?v=privacy-20261126" integrity="sha384-adRid4NbNlahmy4Wf3C2X7jSmtYMYBK7dzIlxxnk/+6CU+1/oylfO4uQc9As8t0f"></script>
+  <script src="privacy.js?v=map-20261126" integrity="sha384-3KUkn0vTlE9iUdzrjE5CzjOg+6peNX7cwhDo8lbYKN8Az2GOAySJ20UuEEOG12Wm"></script>
+  <script src="vendor/leaflet.min.js" integrity="sha384-n+BTYiUcIQX4oNbtEyUQXKW23Ht2vgq99XIkT/6rnj1YY+dd0zrWFE5faeudmoll"></script>
+  <script src="script.js?v=map-20261126" integrity="sha384-jjZCNctuqZGv4goQHen7WEfWtGvjvhI7Zz6NpCEe8kMdAyUGKbF4dHDIxgH0rw70"></script>
   <script src="vendor/xlsx-0.20.3.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"></script>
   <script src="excel.js?v=57" integrity="sha384-5B7SvqcveP23NOjcqsA+f8dh7Hgh6fH40VVQcqoo95h6njKjVWfrKQnY3cMRIXm0"></script>
-  <script src="hero-photos.js?v=privacy-20261126" integrity="sha384-i4OAVgSrmMONudee0k5rUSP0HwiTgL2udcMg8zMda4zCb2KEmAS6uJZ0Hq++89tt"></script>
+  <script src="hero-photos.js?v=map-20261126" integrity="sha384-hOeYdmnxlT+uD8H9s1/f8mwhzp0brtG8g5QaauHmsoy6MTOMepWOikxpxbe9y5M5"></script>
   <script src="card-browser.js?v=58" integrity="sha384-9APkB2bqVAIeEFAO+2x1mAtsfzblf/p9iCuA8NsaLazQKaWRJ6Txfg+nH2PQn/5j"></script>
 </body>
 </html>

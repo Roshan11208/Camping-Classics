@@ -1,43 +1,42 @@
 (() => {
   const slides = [...document.querySelectorAll('.hero-slide')];
-  const region = document.querySelector('.hero-photo-wrap');
-  if (slides.length < 2 || !region) return;
+  const next = document.getElementById('nextHeroPhoto');
+  if (!next || slides.length < 2) return;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let current = 0;
   let timer;
-  let hovering = false;
+  let pending = false;
 
-  function prepareNext() {
-    if (reducedMotion.matches) return;
+  function nextImage() {
     const image = slides[(current + 1) % slides.length].querySelector('img');
     if (image.dataset.src) {
       image.src = image.dataset.src;
       delete image.dataset.src;
     }
-  }
-  function advance() {
-    const next = (current + 1) % slides.length;
-    const image = slides[next].querySelector('img');
-    if (image.complete && image.naturalWidth) {
-      slides[current].hidden = true;
-      slides[next].hidden = false;
-      current = next;
-    }
-    prepareNext();
+    return image;
   }
   function schedule() {
-    clearInterval(timer);
-    if (!reducedMotion.matches && !document.hidden && !hovering && !region.contains(document.activeElement)) {
-      prepareNext();
-      timer = setInterval(advance, 10000);
+    clearTimeout(timer);
+    if (!document.hidden && !reducedMotion.matches) {
+      nextImage();
+      timer = setTimeout(advance, 7000);
     }
   }
-  region.addEventListener('mouseenter', () => { hovering = true; schedule(); });
-  region.addEventListener('mouseleave', () => { hovering = false; schedule(); });
-  region.addEventListener('focusin', schedule);
-  region.addEventListener('focusout', () => setTimeout(schedule, 0));
+  async function advance() {
+    if (pending) return;
+    pending = true;
+    clearTimeout(timer);
+    try {
+      await nextImage().decode();
+      slides[current].hidden = true;
+      current = (current + 1) % slides.length;
+      slides[current].hidden = false;
+    } catch { /* Keep the current photo visible if the next image fails. */ }
+    pending = false;
+    schedule();
+  }
+  next.addEventListener('click', advance);
   reducedMotion.addEventListener('change', schedule);
   document.addEventListener('visibilitychange', schedule);
-  if (document.readyState === 'complete') schedule();
-  else window.addEventListener('load', schedule, { once: true });
+  schedule();
 })();

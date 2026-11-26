@@ -2206,7 +2206,6 @@ async function queryOverpassCamps(lat, lon) {
     [out:json][timeout:7];
     nwr
       ["tourism"~"^(camp_site|caravan_site)$"]
-      ["name"]
       (${box.south},${box.west},${box.north},${box.east});
     out center;
   `;
@@ -2252,7 +2251,7 @@ function normalizeOverpassCamp(element, originLat, originLon) {
     tags.name ||
     tags["name:en"] ||
     tags.official_name ||
-    ""
+    (tags.tourism === "caravan_site" ? "Unnamed RV site" : "Unnamed campground")
   ).trim();
 
   if (!name) {
@@ -2418,8 +2417,50 @@ function renderCampList(camps, label) {
   // Results appear in place without taking scroll control from the visitor.
 }
 
+let campMap;
+let campPins;
+let campRequest = 0;
+const areaButton = document.getElementById("searchMapArea");
+function openCampMap() {
+  if (campMap || !window.L) return campMap;
+  document.getElementById("openCampMap").remove();
+  campMap = L.map("campMap", {scrollWheelZoom: false}).setView([38, -97], 4);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  }).addTo(campMap);
+  campPins = L.layerGroup().addTo(campMap);
+  areaButton.hidden = false;
+  return campMap;
+}
+document.getElementById("openCampMap").addEventListener("click", openCampMap);
+areaButton.addEventListener("click", () => {
+  const center = campMap.getCenter().wrap();
+  findNearbyCamps(center.lat, center.lng, "the map center");
+});
+function plotCampgrounds(camps) {
+  if (!campPins) return;
+  const icon = L.divIcon({className: "camp-pin", iconSize: [18, 18]});
+  for (const camp of camps) {
+    const detail = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = camp.name;
+    const directions = document.createElement("a");
+    directions.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([camp.lat, camp.lon].join(","));
+    directions.textContent = "Open in Google Maps";
+    directions.target = "_blank";
+    directions.rel = "noopener noreferrer";
+    detail.append(name, document.createElement("br"), camp.distance.toFixed(1) + " mi from search center", document.createElement("br"), directions);
+    L.marker([camp.lat, camp.lon], {icon, title: camp.name, alt: camp.name}).bindPopup(detail).addTo(campPins);
+  }
+  if (camps.length) campMap.fitBounds(camps.map(camp => [camp.lat, camp.lon]), {padding: [20, 20], maxZoom: 12});
+}
+
 async function findNearbyCamps(lat, lon, label, waitBeforeSearch = false) {
-  if (!window.campingPrivacy?.canUseOnline()) return;
+  const searchId = ++campRequest;
+  const map = openCampMap();
+  map?.setView([lat, lon], 9);
+  campPins?.clearLayers();
   lastCampSearch = { lat, lon, label, waitBeforeSearch };
   trackEvent("camp_search");
   showCampResults.hidden = true;
@@ -2445,6 +2486,7 @@ async function findNearbyCamps(lat, lon, label, waitBeforeSearch = false) {
         .map((result) => normalizeCamp(result, lat, lon))
         .filter(Boolean);
     } catch (fallbackError) {
+      if (searchId !== campRequest) return;
       finderStatus.textContent =
         "Campground results could not load right now. Try again in a moment.";
 
@@ -2482,6 +2524,7 @@ async function findNearbyCamps(lat, lon, label, waitBeforeSearch = false) {
     }
   }
 
+  if (searchId !== campRequest) return;
   const seen = new Set();
 
   camps = camps
@@ -2494,13 +2537,14 @@ async function findNearbyCamps(lat, lon, label, waitBeforeSearch = false) {
       seen.add(dedupeKey);
       return true;
     })
-    .sort((a, b) => a.distance - b.distance)
-    .slice(0, 5);
+    .sort((a, b) => a.distance - b.distance);
+
+  plotCampgrounds(camps);
 
   finderStatus.textContent =
     camps.length > 0
-      ? `Showing the 5 closest campground listings found within about 40 miles of ${label}.`
-      : `No named campground listings were found within about 40 miles of ${label}.`;
+      ? `Found ${camps.length} campground listings within about 40 miles of ${label}.`
+      : `No campground listings were found within about 40 miles of ${label}.`;
 
   renderCampList(camps, label);
 }
@@ -2513,7 +2557,7 @@ if (campSearchForm && campSearchInput && finderStatus) {
   });
   campSearchForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!(await window.campingPrivacy?.requireOnlineAccess())) return;
+
 
     const locationText = campSearchInput.value.trim();
 
@@ -2523,14 +2567,17 @@ if (campSearchForm && campSearchInput && finderStatus) {
       return;
     }
 
+    const request = ++campRequest;
     finderStatus.textContent = `Finding ${locationText}...`;
 
     try {
       const place = await geocodeLocation(locationText);
+      if (request !== campRequest) return;
 
       // Keep the visible label concise instead of printing the entire geocoder result.
       await findNearbyCamps(place.lat, place.lon, place.label, place.usedNominatim === true);
     } catch (error) {
+      if (request !== campRequest) return;
       finderStatus.textContent =
         error.message || "Could not search that location.";
       campResults.hidden = true;
@@ -2540,25 +2587,28 @@ if (campSearchForm && campSearchInput && finderStatus) {
 
 if (useLocationBtn && finderStatus) {
   useLocationBtn.addEventListener("click", async () => {
-    if (!(await window.campingPrivacy?.requireOnlineAccess())) return;
+
     if (!("geolocation" in navigator)) {
       finderStatus.textContent =
         "Location access is not supported in this browser. Try the city or ZIP search instead.";
       return;
     }
 
+    const request = ++campRequest;
     finderStatus.textContent = "Waiting for location permission...";
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        if (request !== campRequest) return;
         await findNearbyCamps(
-          position.coords.latitude,
-          position.coords.longitude,
+          Number(position.coords.latitude.toFixed(1)),
+          Number(position.coords.longitude.toFixed(1)),
           "your current location",
           false
         );
       },
       () => {
+        if (request !== campRequest) return;
         finderStatus.textContent =
           "Location access was unavailable. You can still search using a city or ZIP code.";
       },

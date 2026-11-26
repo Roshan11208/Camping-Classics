@@ -1,19 +1,21 @@
-const CACHE_NAME = "camping-classics-privacy-20261126";
+const CACHE_NAME = "camping-classics-map-20261126";
 const CORE_ASSETS = [
   "./",
   "./index.html",
+  "./vendor/leaflet.min.js",
+  "./vendor/leaflet.css",
   "./privacy.html",
   "./terms.html",
   "./assets/camp-sunrise.jpg",
   "./assets/camp-forest.jpg",
   "./assets/camp-night.jpg",
-  "./styles.css?v=privacy-20261126",
-  "./hero-photos.js?v=privacy-20261126",
+  "./styles.css?v=map-20261126",
+  "./hero-photos.js?v=map-20261126",
   "./card-browser.css?v=58",
   "./card-browser.js?v=58",
-  "./script.js?v=privacy-20261126",
+  "./script.js?v=map-20261126",
   "./manifest.webmanifest",
-  "./privacy.js?v=privacy-20261126",
+  "./privacy.js?v=map-20261126",
   "./excel.js?v=57",
   "./excel-worker.js",
   "./vendor/xlsx-0.20.3.min.js"
